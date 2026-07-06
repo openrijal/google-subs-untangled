@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Google Subscriptions, Untangled</title>
+<meta name="description" content="An interactive optimizer for Google's subscription maze — answer six questions and get the cheapest combination of Google One, AI, YouTube, Nest, Fitbit and Fi plans.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='7' cy='7' r='4' fill='%234285f4'/%3E%3Ccircle cx='17' cy='7' r='4' fill='%23ea4335'/%3E%3Ccircle cx='7' cy='17' r='4' fill='%23fbbc04'/%3E%3Ccircle cx='17' cy='17' r='4' fill='%2334a853'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================= Material-3-flavored tokens ================= */
+:root{
+  --font-sans:'Google Sans','Google Sans Text',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-mono:'Roboto Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --bg:#f8fafd; --surface:#ffffff; --surface-2:#f0f4f9; --surface-3:#e9eef6;
+  --on-surface:#1f1f1f; --on-variant:#444746;
+  --outline:#747775; --outline-var:#c4c7c5;
+
+  --primary:#1a73e8; --on-primary:#ffffff;
+  --primary-container:#d3e3fd; --on-primary-container:#041e49;
+
+  --green:#146c2e; --green-c:#c4eed0; --on-green-c:#072711;
+  --red:#b3261e;   --red-c:#fce8e6;   --on-red-c:#410e0b;
+  --yellow-c:#feefc3; --on-yellow-c:#574400;
+
+  --gblue:#4285f4; --gred:#ea4335; --gyellow:#fbbc04; --ggreen:#34a853;
+
+  --elev-1:0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+  --elev-2:0 1px 2px rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+}
+html[data-theme="dark"]{
+  --bg:#131314; --surface:#1e1f20; --surface-2:#282a2c; --surface-3:#333537;
+  --on-surface:#e3e3e3; --on-variant:#c4c7c5;
+  --outline:#8e918f; --outline-var:#444746;
+
+  --primary:#a8c7fa; --on-primary:#062e6f;
+  --primary-container:#0842a0; --on-primary-container:#d3e3fd;
+
+  --green:#6dd58c; --green-c:#0f5223; --on-green-c:#c4eed0;
+  --red:#f2b8b5;   --red-c:#5c1a14;   --on-red-c:#f9dedc;
+  --yellow-c:#4d3c00; --on-yellow-c:#fdd663;
+
+  --elev-1:0 1px 3px rgba(0,0,0,.5);
+  --elev-2:0 2px 6px rgba(0,0,0,.5);
+}
+
+/* ================= base ================= */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+body{
+  margin:0; background:var(--bg); color:var(--on-surface);
+  font:400 16px/1.55 var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:96px;
+}
+a{color:var(--primary); text-decoration:none}
+a:hover{text-decoration:underline}
+.mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:.95em}
+.wrap{max-width:1080px; margin:0 auto; padding:0 20px}
+:focus-visible{outline:2px solid var(--primary); outline-offset:2px; border-radius:4px}
+
+/* ================= app bar ================= */
+.appbar{
+  position:sticky; top:0; z-index:50; background:var(--bg);
+  transition:box-shadow .15s, background .15s;
+}
+.appbar.scrolled{background:var(--surface); box-shadow:var(--elev-1)}
+.appbar-inner{display:flex; align-items:center; gap:8px; height:64px; max-width:1080px; margin:0 auto; padding:0 20px}
+.brand{display:flex; align-items:center; gap:12px; font-size:18px; color:var(--on-surface); font-weight:500; white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand svg{flex:none}
+.brand .lite{color:var(--on-variant); font-weight:400}
+.tabs{display:flex; gap:4px; margin-left:28px}
+.tab{
+  position:relative; padding:10px 16px; border-radius:999px; font-size:14px; font-weight:500;
+  color:var(--on-variant); border:none; background:none; cursor:pointer; font-family:inherit;
+}
+.tab:hover{background:var(--surface-2); text-decoration:none; color:var(--on-surface)}
+.tab[aria-current="page"]{background:var(--primary-container); color:var(--on-primary-container)}
+.appbar .spacer{flex:1}
+.iconbtn{
+  width:44px;height:44px; border-radius:50%; border:none; background:none; cursor:pointer;
+  display:grid; place-items:center; color:var(--on-variant);
+}
+.iconbtn:hover{background:var(--surface-2)}
+.iconbtn svg{width:22px;height:22px;fill:currentColor}
+#icon-sun{display:none}
+html[data-theme="dark"] #icon-sun{display:block}
+html[data-theme="dark"] #icon-moon{display:none}
+
+/* ================= views / hero ================= */
+.view{display:none}
+.view.active{display:block}
+.hero{padding:44px 0 8px; max-width:760px}
+.eyebrow{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--primary); font-weight:700; margin:0 0 10px}
+h1{font-size:clamp(30px,5vw,46px); font-weight:400; line-height:1.14; letter-spacing:-.5px; margin:0 0 14px; text-wrap:balance}
+h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
+.view > .wrap > h2:first-child{margin-top:40px}
+.sub{color:var(--on-variant); margin:0 0 24px; max-width:68ch}
+.lede{color:var(--on-variant); font-size:18px; margin:0; max-width:62ch}
+.freshness{
+  display:flex; gap:12px; align-items:flex-start; margin:26px 0 8px; padding:14px 16px;
+  background:var(--yellow-c); color:var(--on-yellow-c); border-radius:12px; font-size:13.5px; line-height:1.5;
+}
+.freshness svg{flex:none; width:20px; height:20px; fill:currentColor; margin-top:1px}
+
+/* ================= optimizer ================= */
+.optimizer{display:grid; grid-template-columns:minmax(0,1fr) 372px; gap:24px; align-items:start; margin-top:24px}
+.qcard{background:var(--surface); border:1px solid var(--outline-var); border-radius:16px; padding:20px 22px}
+.qcard + .qcard{margin-top:14px}
+.qlabel{font-weight:500; margin:0 0 3px; font-size:16px}
+.qhint{color:var(--on-variant); font-size:13px; margin:0 0 14px}
+.qhint a{white-space:nowrap}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid var(--outline-var); background:var(--surface); color:var(--on-variant);
+  border-radius:8px; padding:7px 14px; font-size:14px; font-weight:500; font-family:inherit; cursor:pointer;
+  transition:background .12s,border-color .12s,color .12s;
+}
+.chip:hover{background:var(--surface-2)}
+.chip .tick{display:none; width:16px; height:16px; fill:currentColor}
+.chip[aria-pressed="true"]{background:var(--primary-container); color:var(--on-primary-container); border-color:transparent}
+.chip[aria-pressed="true"] .tick{display:block}
+.chk{
+  display:inline-flex; align-items:center; gap:8px; border:1px solid var(--outline-var); background:var(--surface);
+  border-radius:8px; padding:7px 14px; font-size:14px; font-weight:500; color:var(--on-variant); cursor:pointer;
+}
+.chk input{accent-color:var(--primary); margin:0; width:16px; height:16px}
+.chk:has(input:checked){background:var(--primary-container); color:var(--on-primary-container); border-color:transparent}
+
+/* ================= receipt ================= */
+.receipt{
+  position:sticky; top:80px; background:var(--surface); border:1px solid var(--outline-var);
+  border-radius:16px; overflow:hidden; box-shadow:var(--elev-1);
+}
+.receipt-head{padding:18px 20px 14px; border-bottom:1px dashed var(--outline-var)}
+.receipt-head .tag{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--on-variant); font-weight:700}
+.receipt-head .anchor-name{font-size:19px; font-weight:500; margin-top:4px}
+.receipt-head .anchor-name a{color:inherit}
+.receipt-head .billing{margin-top:12px}
+.receipt-head .billing .chip{padding:5px 12px; font-size:13px}
+.receipt-body{padding:6px 20px 4px}
+.rline{display:flex; justify-content:space-between; gap:14px; padding:9px 0; border-bottom:1px solid var(--surface-3); font-size:14px}
+.rline:last-child{border-bottom:0}
+.rline .item{min-width:0}
+.rline .item b{font-weight:500}
+.rline .item a{color:inherit; text-decoration:underline; text-decoration-color:var(--outline-var); text-underline-offset:3px}
+.rline .item a:hover{text-decoration-color:var(--primary); color:var(--primary)}
+.rline .why{display:block; color:var(--on-variant); font-size:12.5px; margin-top:2px}
+.rline .why a{font-size:inherit}
+.rline .price{white-space:nowrap; font-weight:500; font-family:var(--font-mono)}
+.rline .price.free{color:var(--green)}
+.receipt-total{padding:14px 20px; border-top:1px dashed var(--outline-var); display:flex; justify-content:space-between; align-items:baseline}
+.receipt-total .t{font-weight:500}
+.receipt-total .amt{font-size:28px; font-weight:500; font-family:var(--font-mono)}
+.receipt-total .amt small{font-size:13px; color:var(--on-variant); font-weight:400}
+.savings{margin:0 20px 14px; padding:10px 14px; border-radius:10px; background:var(--green-c); color:var(--on-green-c); font-size:13.5px; line-height:1.5}
+.rnotes{padding:0 20px 14px; color:var(--on-variant); font-size:12.5px; line-height:1.55}
+.rnotes ul{margin:0; padding-left:16px}
+.rnotes li{margin:5px 0}
+.alts{padding:12px 20px 18px; border-top:1px solid var(--surface-3); font-size:13px; color:var(--on-variant)}
+.alts .row{display:flex; justify-content:space-between; padding:3px 0; font-family:var(--font-mono)}
+.alts b{font-family:var(--font-sans)}
+
+/* mobile running-total bar */
+.totalbar{
+  display:none; position:fixed; left:12px; right:12px; bottom:88px; z-index:40;
+  background:var(--primary); color:var(--on-primary); border-radius:999px; padding:12px 20px;
+  font-weight:500; box-shadow:var(--elev-2); align-items:center; justify-content:space-between; gap:12px;
+  border:none; font-family:inherit; font-size:15px; cursor:pointer; width:calc(100% - 24px);
+}
+.totalbar .mono{font-size:16px}
+
+/* ================= tables ================= */
+.tablewrap{overflow-x:auto; border:1px solid var(--outline-var); border-radius:16px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:720px; font-size:14px}
+th,td{padding:12px 14px; text-align:left; border-bottom:1px solid var(--surface-3); vertical-align:top}
+thead th{background:var(--surface-2); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--on-variant); font-weight:700}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--surface-2)}
+td.num,th.num{text-align:right; white-space:nowrap; font-family:var(--font-mono); font-variant-numeric:tabular-nums}
+th.num{font-family:var(--font-sans)}
+.inc{color:var(--green); font-weight:500}
+.noinc{color:var(--outline)}
+.badge{display:inline-block; font-size:11px; border-radius:6px; padding:1px 8px; font-weight:700; vertical-align:1px; margin-left:6px; white-space:nowrap}
+.badge.v{background:var(--green-c); color:var(--on-green-c)}
+.badge.u{background:var(--yellow-c); color:var(--on-yellow-c)}
+.badge.mgr{background:var(--red-c); color:var(--on-red-c)}
+.ext{white-space:nowrap}
+.ext svg{width:13px; height:13px; fill:currentColor; vertical-align:-1.5px; margin-left:2px}
+
+/* ================= traps ================= */
+.traps{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin-top:24px}
+.trap{background:var(--surface); border:1px solid var(--outline-var); border-left:4px solid var(--gred); border-radius:12px; padding:18px 20px}
+.trap h3{margin:0 0 6px; font-size:16px; font-weight:500}
+.trap p{margin:0; color:var(--on-variant); font-size:13.5px}
+.trap .fix{display:block; margin-top:10px; color:var(--green); font-size:13.5px; font-weight:500}
+.trap .more{display:inline-block; margin-top:8px; font-size:13px}
+
+/* ================= rules / sources ================= */
+.rules{background:var(--surface); border:1px solid var(--outline-var); border-radius:16px; padding:10px 26px; margin-top:24px}
+.rules dt{font-weight:500; margin-top:18px; font-size:16px}
+.rules dd{margin:5px 0 18px; color:var(--on-variant); font-size:14.5px; max-width:76ch}
+.sources{color:var(--on-variant); font-size:14px; line-height:1.65; max-width:78ch; margin-top:24px}
+.sources ul{padding-left:20px}
+.sources li{margin:6px 0}
+footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-height:1.6; max-width:78ch}
+
+/* ================= bottom nav (mobile) ================= */
+.bottomnav{
+  display:none; position:fixed; left:0; right:0; bottom:0; z-index:50;
+  background:var(--surface-2); border-top:1px solid var(--outline-var);
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+.bottomnav .items{display:flex; max-width:520px; margin:0 auto}
+.bnav{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  border:none; background:none; font-family:inherit; font-size:11.5px; font-weight:500;
+  color:var(--on-variant); cursor:pointer; padding:4px 0;
+}
+.bnav svg{width:22px; height:22px; fill:currentColor}
+.bnav .pill{display:grid; place-items:center; width:56px; height:30px; border-radius:999px}
+.bnav[aria-current="page"]{color:var(--on-surface)}
+.bnav[aria-current="page"] .pill{background:var(--primary-container); color:var(--on-primary-container)}
+
+/* ================= responsive ================= */
+@media (max-width:900px){
+  .optimizer{grid-template-columns:1fr}
+  .receipt{position:static}
+  .tabs{display:none}
+  .bottomnav{display:block}
+  .totalbar{display:flex}
+  body{padding-bottom:150px}
+  .hero{padding-top:28px}
+}
+</style>
+</head>
+<body>
+
+<header class="appbar" id="appbar">
+  <div class="appbar-inner">
+    <a class="brand" href="#/">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="7" cy="7" r="4" fill="var(--gblue)"/><circle cx="17" cy="7" r="4" fill="var(--gred)"/>
+        <circle cx="7" cy="17" r="4" fill="var(--gyellow)"/><circle cx="17" cy="17" r="4" fill="var(--ggreen)"/>
+      </svg>
+      <span>Subscriptions<span class="lite">, untangled</span></span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a class="tab" href="#/" data-route="optimizer">Optimizer</a>
+      <a class="tab" href="#/plans" data-route="plans">Plans &amp; bundles</a>
+      <a class="tab" href="#/traps" data-route="traps">Traps</a>
+      <a class="tab" href="#/sources" data-route="sources">Sources</a>
+    </nav>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="themeToggle" aria-label="Toggle dark mode">
+      <svg id="icon-moon" viewBox="0 0 24 24"><path d="M12 21q-3.75 0-6.375-2.625T3 12q0-3.75 2.625-6.375T12 3q.35 0 .688.025t.662.075q-1.025.725-1.638 1.888T11.1 7.5q0 2.25 1.575 3.825T16.5 12.9q1.375 0 2.525-.613T20.9 10.65q.05.325.075.662T21 12q0 3.75-2.625 6.375T12 21Z"/></svg>
+      <svg id="icon-sun" viewBox="0 0 24 24"><path d="M12 17q-2.075 0-3.537-1.463T7 12q0-2.075 1.463-3.537T12 7q2.075 0 3.538 1.463T17 12q0 2.075-1.462 3.537T12 17ZM2 13q-.425 0-.712-.288T1 12q0-.425.288-.712T2 11h2q.425 0 .713.288T5 12q0 .425-.287.713T4 13H2Zm18 0q-.425 0-.712-.288T19 12q0-.425.288-.712T20 11h2q.425 0 .713.288T23 12q0 .425-.287.713T22 13h-2Zm-8-8q-.425 0-.712-.288T11 4V2q0-.425.288-.712T12 1q.425 0 .713.288T13 2v2q0 .425-.287.713T12 5Zm0 18q-.425 0-.712-.288T11 22v-2q0-.425.288-.712T12 19q.425 0 .713.288T13 20v2q0 .425-.287.713T12 23ZM5.65 7.05 4.575 6q-.3-.275-.288-.7t.288-.725q.3-.3.725-.3t.7.3L7.05 5.65q.275.3.275.7t-.275.7q-.275.3-.687.288t-.713-.288Zm12.7 12.725L17.3 18.7q-.275-.3-.275-.712t.275-.688q.275-.3.688-.287t.712.287L19.775 18.35q.3.275.288.7t-.288.725q-.3.3-.725.3t-.7-.3ZM17.3 7.05q-.3-.275-.288-.687t.288-.713L18.35 4.575q.275-.3.7-.288t.725.288q.3.3.3.725t-.3.7L18.7 7.05q-.3.275-.712.275T17.3 7.05ZM4.575 19.775q-.3-.3-.3-.725t.3-.7l1.075-1.05q.3-.275.713-.275t.687.275q.3.275.288.688t-.288.712L6 19.775q-.275.3-.7.288t-.725-.288Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- ================================ OPTIMIZER ================================ -->
+<section class="view" id="view-optimizer">
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">US pricing · updated July 5, 2026</p>
+      <h1>One Google bill, without paying twice</h1>
+      <p class="lede">Google sells storage, AI, YouTube, smart-home, health, and phone plans as eight overlapping subscriptions — several of which quietly include each other. Answer six questions and get the cheapest combination that covers what you actually use.</p>
+    </header>
+    <div class="freshness">
+      <svg viewBox="0 0 24 24"><path d="M1 21 12 2l11 19H1Zm11-3q.425 0 .713-.288T13 17q0-.425-.287-.712T12 16q-.425 0-.712.288T11 17q0 .425.288.713T12 18Zm-1-3h2v-5h-2v5Z"/></svg>
+      <div><b>How current is this?</b> Prices were pulled from Google's official plan and support pages on July 5, 2026, and reflect the June 2026 YouTube price increase. Items marked <span class="badge u">check</span> came from a single source or from pages that disagree with each other — confirm on Google's site before you commit.</div>
+    </div>
+
+    <div class="optimizer">
+      <div class="questions">
+        <div class="qcard">
+          <p class="qlabel">Who is this for?</p>
+          <p class="qhint">Family YouTube plans require everyone at the same home address — <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">checked every 30 days</a>.</p>
+          <div class="chips" data-q="people" role="group" aria-label="Who is this for">
+            <button class="chip" data-v="1" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Just me</button>
+            <button class="chip" data-v="family" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Family, same address (2–6)</button>
+            <button class="chip" data-v="split" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Family, different addresses</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">How much cloud storage does your household need?</p>
+          <p class="qhint">Pooled across Gmail, Drive &amp; Photos. Every paid tier can be shared with up to 5 family members at any address.</p>
+          <div class="chips" data-q="storage" role="group" aria-label="Storage need">
+            <button class="chip" data-v="0" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>15 GB free is fine</button>
+            <button class="chip" data-v="100" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Up to 100 GB</button>
+            <button class="chip" data-v="2048" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Up to 2 TB</button>
+            <button class="chip" data-v="5120" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>5 TB or more</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">YouTube without ads?</p>
+          <p class="qhint">"Lite" removes ads on regular videos only — no YouTube Music, and ads can still appear on Shorts and music content.</p>
+          <div class="chips" data-q="youtube" role="group" aria-label="YouTube preference">
+            <button class="chip" data-v="none" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ads don't bother me</button>
+            <button class="chip" data-v="lite" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free videos, just me</button>
+            <button class="chip" data-v="full" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free + Music, just me</button>
+            <button class="chip" data-v="family" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free for the whole family</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">How much Gemini / Google AI?</p>
+          <p class="qhint">AI plans are also storage plans — picking one here can make a separate Google One plan redundant. <a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Compare AI plans</a></p>
+          <div class="chips" data-q="ai" role="group" aria-label="AI need">
+            <button class="chip" data-v="0" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>None</button>
+            <button class="chip" data-v="1" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Casual (AI Plus)</button>
+            <button class="chip" data-v="2" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Power user (AI Pro)</button>
+            <button class="chip" data-v="3" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Maximum (AI Ultra)</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">Nest / Google Home cameras?</p>
+          <p class="qhint">Google Home Premium is the subscription formerly known as Nest Aware. Standard is included free with AI Pro; Advanced with AI Ultra. <a href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Details</a></p>
+          <div class="chips" data-q="home" role="group" aria-label="Smart home cameras">
+            <button class="chip" data-v="none" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>No cameras</button>
+            <button class="chip" data-v="std" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Standard (event history)</button>
+            <button class="chip" data-v="adv" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Advanced (24/7 recording)</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">Fitbit / Pixel Watch health coaching?</p>
+          <p class="qhint">Google Health Premium (formerly Fitbit Premium) — included free with AI Pro and AI Ultra.</p>
+          <div class="chips" data-q="health" role="group" aria-label="Health subscription">
+            <button class="chip" data-v="no" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>No</button>
+            <button class="chip" data-v="yes" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Yes</button>
+          </div>
+        </div>
+
+        <div class="qcard">
+          <p class="qlabel">Anything else?</p>
+          <p class="qhint">Independent subscriptions — but Fi's top plan bundles Google One 100 GB and a 6-month YouTube Premium trial.</p>
+          <div class="chips" data-q-extras role="group" aria-label="Extras">
+            <label class="chk"><input type="checkbox" id="x-fi"> Google Fi phone plan</label>
+            <label class="chk"><input type="checkbox" id="x-yttv"> YouTube TV (live TV)</label>
+          </div>
+        </div>
+      </div>
+
+      <aside class="receipt" id="receipt" aria-live="polite">
+        <div class="receipt-head">
+          <div class="tag">Your cheapest stack</div>
+          <div class="anchor-name" id="r-anchor">—</div>
+          <div class="billing chips" data-q="billing" role="group" aria-label="Billing cadence">
+            <button class="chip" data-v="monthly" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Monthly</button>
+            <button class="chip" data-v="annual" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Annual where available</button>
+          </div>
+        </div>
+        <div class="receipt-body" id="r-lines"></div>
+        <div class="receipt-total">
+          <span class="t">Total</span>
+          <span class="amt" id="r-total">$0<small>/mo</small></span>
+        </div>
+        <div class="savings" id="r-savings" hidden></div>
+        <div class="rnotes"><ul id="r-notes"></ul></div>
+        <div class="alts" id="r-alts"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================================ PLANS ================================ -->
+<section class="view" id="view-plans">
+  <div class="wrap">
+    <h2>The bundle map</h2>
+    <p class="sub">Google's AI plans are the center of gravity: they absorbed storage, and in 2026 they absorbed smart-home, health, and (partially) YouTube. <span class="badge mgr">manager only</span> means the perk never extends to your family group, even on a family plan.</p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr>
+        <th>Anchor plan</th><th class="num">Price / mo</th><th>Storage</th><th>Gemini AI</th><th>YouTube</th><th>Home (Nest)</th><th>Health (Fitbit)</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><a class="ext" href="https://one.google.com/about/plans" target="_blank" rel="noopener"><b>Google One Basic</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a></td>
+          <td class="num">$1.99</td>
+          <td class="inc">100 GB, share ×5</td><td class="noinc">—</td><td class="noinc">—</td><td class="noinc">—</td><td class="noinc">—</td>
+        </tr>
+        <tr>
+          <td><a class="ext" href="https://one.google.com/about/plans" target="_blank" rel="noopener"><b>Google AI Plus</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a><span class="badge u">check</span></td>
+          <td class="num">$9.99</td>
+          <td class="inc">400 GB <b>or</b> 2 TB by membership, share ×5</td>
+          <td class="inc">2× limits, Flash</td><td class="noinc">—</td><td class="noinc">—</td><td class="noinc">—</td>
+        </tr>
+        <tr>
+          <td><a class="ext" href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener"><b>Google AI Pro</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a></td>
+          <td class="num">$19.99</td>
+          <td class="inc">5 TB, share ×5</td><td class="inc">4× limits, Pro model, Deep Research</td>
+          <td class="inc">Premium Lite <span class="badge mgr">manager only</span></td>
+          <td class="inc">Premium Standard ($10 value)</td>
+          <td class="inc">Health Premium ($9.99 value)</td>
+        </tr>
+        <tr>
+          <td><a class="ext" href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener"><b>Google AI Ultra</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a><span class="badge u">check</span></td>
+          <td class="num">from $100</td>
+          <td class="inc">20 TB+</td><td class="inc">Up to 20× Pro's limits</td>
+          <td class="inc">Full Premium (individual) <span class="badge mgr">manager only</span></td>
+          <td class="inc">Premium Advanced ($20 value)</td>
+          <td class="inc">Health Premium</td>
+        </tr>
+        <tr>
+          <td><a class="ext" href="https://fi.google.com/about/plans" target="_blank" rel="noopener"><b>Google Fi Unlimited Premium</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a></td>
+          <td class="num">$65 (1 line)</td>
+          <td class="inc">100 GB, share ×5</td><td class="noinc">—</td>
+          <td class="inc">Premium free for 6 mo, then paid</td><td class="noinc">—</td><td class="noinc">—</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Every subscription, one table</h2>
+    <p class="sub">Standalone prices after the June 2026 YouTube increase. "Share" = how many people beyond the owner; YouTube family sharing additionally requires one household address. Plan names link to the official sign-up page.</p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr><th>Subscription</th><th class="num">Monthly</th><th class="num">Annual</th><th>Share</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google One Basic (100 GB)</a><span class="badge v">verified</span></td><td class="num">$1.99</td><td class="num">$19.99</td><td>+5, any address</td><td>Storage pools across Gmail/Drive/Photos. Annual saves up to 16%.</td></tr>
+        <tr><td><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google One 200 GB</a><span class="badge u">check</span></td><td class="num">$2.99</td><td class="num">$29.99</td><td>+5</td><td>Long-standing tier; not re-verified in this pass.</td></tr>
+        <tr><td><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google AI Plus</a></td><td class="num">$9.99</td><td class="num">—</td><td>+5</td><td>Replaced the old 2 TB "Premium" tier as the $9.99 plan. Sold in 400 GB and 2 TB variants depending on membership.</td></tr>
+        <tr><td><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI Pro</a></td><td class="num">$19.99</td><td class="num">$199.99 (~$16.67/mo)</td><td>+5 (AI &amp; storage)</td><td>Bundled YouTube Lite / Home / Health perks are <b>not</b> shared with family (<a href="https://support.google.com/googleone/answer/16105039" target="_blank" rel="noopener">restrictions</a>). Some memberships carry 10 TB.</td></tr>
+        <tr><td><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI Ultra</a><span class="badge u">check</span></td><td class="num">from $100</td><td class="num">—</td><td>+5 (AI &amp; storage)</td><td>New $100 tier added May 2026; the original top tier costs more. Includes full YouTube Premium (individual).</td></tr>
+        <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium (individual)</a></td><td class="num">$15.99</td><td class="num">$159.99 (~$13.33/mo)</td><td>—</td><td>Ad-free everything + Music + downloads + background play.</td></tr>
+        <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium (family)</a></td><td class="num">$26.99</td><td class="num">none in US</td><td>+5, same address</td><td>Only way to get ad-free YouTube for a whole household. <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">30-day address check-ins</a> since Sept 2025.</td></tr>
+        <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium Lite</a></td><td class="num">$8.99</td><td class="num">—</td><td>—</td><td>Ad-free regular videos only. No Music; ads may remain on Shorts, music, search.</td></tr>
+        <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium (student)</a></td><td class="num">$8.99</td><td class="num">—</td><td>—</td><td>SheerID verification, max 4 years, then converts to $15.99.</td></tr>
+        <tr><td><a href="https://music.youtube.com" target="_blank" rel="noopener">YouTube Music Premium</a></td><td class="num">$11.99</td><td class="num">—</td><td>family $18.99</td><td>Full Premium is only $4 more than Music alone.</td></tr>
+        <tr><td><a href="https://tv.youtube.com" target="_blank" rel="noopener">YouTube TV</a></td><td class="num">$82.99</td><td class="num">—</td><td>household</td><td>$67.99 for first 3 months. Live TV; independent of Premium.</td></tr>
+        <tr><td><a href="https://tv.youtube.com/learn/nflsundayticket/" target="_blank" rel="noopener">NFL Sunday Ticket</a></td><td class="num">—</td><td class="num">$240 season (new)</td><td>+5 household</td><td>$480 returning standalone / $378 with YouTube TV; $119 student. No YouTube TV required.</td></tr>
+        <tr><td><a href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Google Home Premium — Standard</a></td><td class="num">$10</td><td class="num">—</td><td>home structure</td><td>Formerly Nest Aware. Free with AI Pro &amp; Ultra.</td></tr>
+        <tr><td><a href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Google Home Premium — Advanced</a></td><td class="num">$20</td><td class="num">—</td><td>home structure</td><td>24/7 recording. Free with AI Ultra; paid add-on for AI Pro.</td></tr>
+        <tr><td><a href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Google Health Premium</a></td><td class="num">$9.99</td><td class="num">$99.99</td><td>—</td><td>Formerly Fitbit Premium. Free with AI Pro &amp; Ultra. Needs a paired Pixel Watch/Fitbit, 18+.</td></tr>
+        <tr><td><a href="https://fi.google.com/about/plans" target="_blank" rel="noopener">Google Fi — Unlimited Premium</a></td><td class="num">$65 / 1 line</td><td class="num">—</td><td>up to 6 lines</td><td>$110/2, $135/3, $160/4, $200/5, $240/6. Only this tier bundles Google One 100 GB + <a href="https://support.google.com/fi/answer/12999259" target="_blank" rel="noopener">6-mo YouTube Premium</a>.</td></tr>
+        <tr><td><a href="https://fi.google.com/about/plans" target="_blank" rel="noopener">Google Fi — Standard / Essentials / Flexible</a></td><td class="num">$50 / $35 / $20+</td><td class="num">—</td><td>multi-line</td><td>No Google One or YouTube perks on these tiers.</td></tr>
+        <tr><td><a href="https://play.google.com/about/play-pass/" target="_blank" rel="noopener">Google Play Pass</a><span class="badge u">check</span></td><td class="num">$5.99</td><td class="num">$29.99</td><td>+5</td><td>Apps &amp; games catalog. Not re-verified in this pass.</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Perks, promos &amp; annual savings</h2>
+    <p class="sub">Beyond the sticker price, three recurring patterns are worth planning around.</p>
+    <div class="traps" style="margin-top:24px">
+      <div class="trap" style="border-left-color:var(--ggreen)"><h3>10% back in Google Store credit</h3>
+        <p>Google AI Plus, AI Pro, and AI Ultra members earn 10% back as Google Store credit on device and accessory purchases (US, CA, UK, DE, AU). Credit lands ~24h after your order ships and <b>expires after 365 days</b>. Buying a $999 Pixel effectively rebates ~$100 — worth timing hardware purchases after you subscribe.</p>
+        <a class="more" href="https://support.google.com/googleone/answer/9003266" target="_blank" rel="noopener">Read more — claim Google One benefits</a></div>
+      <div class="trap" style="border-left-color:var(--ggreen)"><h3>Annual billing: the quiet 15–17%</h3>
+        <p>Where Google sells an annual plan, it prices at roughly ten months: Google One Basic $19.99/yr (vs $23.88 monthly), 200 GB $29.99/yr, AI Pro $199.99/yr (~$16.67/mo vs $19.99), YouTube Premium individual $159.99/yr (~$13.33/mo vs $15.99), Health Premium $99.99/yr, Play Pass $29.99/yr. Annual is <b>web-only</b> — the mobile apps mostly push monthly. YouTube Family, Lite, and Music have no US annual option.</p>
+        <a class="more" href="https://one.google.com/about/plans" target="_blank" rel="noopener">Compare on the web</a></div>
+      <div class="trap" style="border-left-color:var(--ggreen)"><h3>The January sale &amp; other recurring promos</h3>
+        <p>Google has run a New-Year 50%-off-first-year sale (ended Jan 15, 2026: AI Pro $99.99/yr, Basic $9.99/yr) — if you're subscribing in December, wait. Also recurring: Fi's bring-a-Pixel 50%-off-12-months offer, YouTube TV's $67.99 intro (first 3 months), NFL Sunday Ticket presale pricing ($240 new vs $480 returning), student rates (YouTube Premium $8.99, Sunday Ticket $119), and free-trial months bundled with new Pixel devices.</p>
+        <a class="more" href="https://9to5google.com/2026/01/15/google-one-2026-offer/" target="_blank" rel="noopener">Read more — the 2026 January offer</a></div>
+    </div>
+
+    <h2>Where you subscribe matters</h2>
+    <p class="sub">The same plan costs different amounts — and is managed in different places — depending on the storefront you buy it through. Rule of thumb: <b>subscribe on the web, in a browser, signed into the account that should own the plan.</b></p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr><th>Channel</th><th>Price impact</th><th>What to know</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>Web</b> (one.google.com, youtube.com)</td>
+          <td class="inc">Cheapest — and the only place with annual billing</td>
+          <td>Annual plans, student verification (SheerID), and most promos are web-only. Manage/cancel at <a href="https://myaccount.google.com/subscriptions" target="_blank" rel="noopener">myaccount.google.com/subscriptions</a>.</td>
+        </tr>
+        <tr>
+          <td><b>iOS App Store</b> (in-app on iPhone/iPad)</td>
+          <td><span class="badge mgr">~30% markup</span></td>
+          <td>Apple's commission is passed to you: YouTube Premium runs about <b>$5/mo more</b> ($21 vs $16 individual; family ~$7 more). If you're already Apple-billed, cancel and re-subscribe in Safari at the web price. <a href="https://support.google.com/youtube/answer/10217125" target="_blank" rel="noopener">Check where you're billed</a>.</td>
+        </tr>
+        <tr>
+          <td><b>Google Play billing</b> (Android app / Play Store)</td>
+          <td>Same monthly price; usually no annual option in-app</td>
+          <td>The subscription lives under Play's terms and is managed in <a href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener">Play subscriptions</a>, not the Google One app — a common cancellation dead-end. Upside: you can pay with Play balance / gift cards, which are often sold at a discount. <a href="https://support.google.com/googleplay/answer/7018481" target="_blank" rel="noopener">Cancel or change a Play subscription</a>.</td>
+        </tr>
+        <tr>
+          <td><b>Partner / carrier billing</b> (Google Fi, telcos, device bundles)</td>
+          <td>Sometimes bundled free (Fi Premium), sometimes trial-only</td>
+          <td>Third-party-billed Google One plans have different terms, and the perks can change or lapse without notice — Fi users have reported consolidated One + YouTube billing silently breaking. Keep an eye on the first bill after any plan change. <a href="https://support.google.com/googleone/answer/15801606" target="_blank" rel="noopener">Third-party Google One subscriptions</a>.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="rules"><dl>
+      <dt>Whoever clicks "subscribe" owns the plan.</dt>
+      <dd>Family sharing flows from the plan manager: only the family manager's purchase shares storage, and only they receive manager-only perks (bundled YouTube, Store credit). Buy family plans from the account that manages your <a href="https://families.google.com" target="_blank" rel="noopener">Google family group</a>, not a member's account.</dd>
+      <dt>Bundled perks need activation.</dt>
+      <dd>AI Pro's YouTube Premium Lite won't activate while any standalone YouTube subscription is running, and the Home Premium entitlement must be manually applied to your Home structure (which then auto-cancels and refunds the old Nest subscription). Included ≠ automatic.</dd>
+      <dt>Cancel, don't delete.</dt>
+      <dd>Cancelling a Google One plan keeps benefits until the period ends; "deleting the service" from your Google account kills access immediately. And cancel in the storefront where you bought it — web, Play, or App Store each have their own switch.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<!-- ================================ TRAPS ================================ -->
+<section class="view" id="view-traps">
+  <div class="wrap">
+    <h2>Ten ways people overpay</h2>
+    <p class="sub">Each of these is a real overlap in Google's own plan structure — the optimizer routes around all of them.</p>
+    <div class="traps">
+      <div class="trap"><h3>Google One 2 TB + AI Pro</h3>
+        <p>AI Pro already includes 5 TB. Keeping a separate $9.99 storage plan next to it buys you nothing.</p>
+        <span class="fix">Fix: cancel the storage plan; AI Pro's 5 TB pools with your family the same way.</span>
+        <a class="more" href="https://support.google.com/googleone/answer/14534406" target="_blank" rel="noopener">Read more — AI Pro benefits</a></div>
+      <div class="trap"><h3>Standalone YouTube Premium + AI Pro/Ultra</h3>
+        <p>The bundled YouTube benefit won't even activate while a standalone subscription is running — you just pay twice. No partial-month refunds when you cancel.</p>
+        <span class="fix">Fix: cancel standalone at period end; the bundled plan activates automatically.</span>
+        <a class="more" href="https://support.google.com/googleone/answer/15808277" target="_blank" rel="noopener">Read more — YouTube add-on rules</a></div>
+      <div class="trap"><h3>Expecting family YouTube from AI Pro or Google One</h3>
+        <p>Every YouTube perk attached to Google One / AI plans is <b>manager-only</b> — your family group never gets it, even on a "family" plan.</p>
+        <span class="fix">Fix: family ad-free YouTube exists only as YouTube Premium Family, $26.99/mo.</span>
+        <a class="more" href="https://support.google.com/googleone/answer/16105039" target="_blank" rel="noopener">Read more — benefit restrictions</a></div>
+      <div class="trap"><h3>Paying for Nest Aware next to an AI plan</h3>
+        <p>Home Premium Standard is free with AI Pro (Advanced with Ultra). Applying the entitlement to a home that already pays auto-cancels and refunds the old subscription — but only if you apply it.</p>
+        <span class="fix">Fix: apply the Google One entitlement to the same Home structure.</span>
+        <a class="more" href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Read more — Home &amp; Health with AI plans</a></div>
+      <div class="trap"><h3>Fitbit Premium next to an AI plan</h3>
+        <p>Google Health Premium ($9.99/mo) is included with AI Pro and Ultra in 30+ countries.</p>
+        <span class="fix">Fix: cancel the standalone health subscription.</span>
+        <a class="more" href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Read more — eligibility</a></div>
+      <div class="trap"><h3>YouTube Music when you'd use Premium</h3>
+        <p>Music alone is $11.99; full Premium is $15.99. If you watch any YouTube, the extra $4 buys ad-free video, downloads, and background play.</p>
+        <span class="fix">Fix: compare against full Premium before subscribing to Music alone.</span>
+        <a class="more" href="https://www.youtube.com/premium" target="_blank" rel="noopener">Compare YouTube plans</a></div>
+      <div class="trap"><h3>Forgetting the Fi promo expires</h3>
+        <p>Fi Unlimited Premium's YouTube Premium is free for 6 months, then silently converts to a paid monthly subscription until you cancel. Downgrading or pausing Fi forfeits it.</p>
+        <span class="fix">Fix: calendar the 6-month mark; decide deliberately.</span>
+        <a class="more" href="https://support.google.com/fi/answer/12999259" target="_blank" rel="noopener">Read more — Fi YouTube Premium terms</a></div>
+      <div class="trap"><h3>Rebuying NFL Sunday Ticket as a returning user</h3>
+        <p>New-user presale pricing is $240; returning users pay $480 standalone ($378 with YouTube TV).</p>
+        <span class="fix">Fix: buy during presale windows; students pay $119 with SheerID verification.</span>
+        <a class="more" href="https://tv.youtube.com/learn/nflsundayticket/" target="_blank" rel="noopener">Read more — Sunday Ticket pricing</a></div>
+      <div class="trap"><h3>Subscribing inside the iOS app</h3>
+        <p>Apple's App Store commission is passed straight to you: YouTube Premium costs about $5/mo more when Apple-billed ($21 vs $16 individual), and family runs ~$7/mo more. It renews at that price forever.</p>
+        <span class="fix">Fix: cancel the Apple-billed plan, re-subscribe in Safari on the web at the normal price.</span>
+        <a class="more" href="https://support.google.com/youtube/answer/10217125" target="_blank" rel="noopener">Read more — check where you're billed</a></div>
+      <div class="trap"><h3>Paying monthly when annual exists</h3>
+        <p>Google prices annual plans at roughly ten months: YouTube Premium $159.99/yr vs $191.88 paid monthly, AI Pro $199.99 vs $239.88, Google One Basic $19.99 vs $23.88. The apps rarely surface annual — it's on the web.</p>
+        <span class="fix">Fix: flip the optimizer's billing toggle to "Annual" and subscribe on the web.</span>
+        <a class="more" href="https://one.google.com/about/plans" target="_blank" rel="noopener">Compare annual pricing</a></div>
+    </div>
+
+    <h2>The rules that decide everything</h2>
+    <div class="rules"><dl>
+      <dt>Storage shares generously; perks don't.</dt>
+      <dd>Any paid Google One / AI plan shares its storage and (on AI plans) AI features with up to 5 family members at any address, each with their own daily AI limits. But the bundled subscriptions — YouTube Lite/Premium, and bundle savings generally — stay with the plan manager alone. <a href="https://support.google.com/googleone/answer/16105039" target="_blank" rel="noopener">Official list of restrictions</a></dd>
+      <dt>YouTube family plans are strict about the roof.</dt>
+      <dd>Up to 6 people, but all must live at the family manager's address. Since September 2025 YouTube runs an electronic check-in every 30 days; flagged members get 14 days to verify before benefits pause. A family spread across addresses simply can't share one plan. <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">Family plan rules</a></dd>
+      <dt>AI plans are the consolidation point.</dt>
+      <dd>If you want two or more of {2 TB+ storage, serious Gemini use, Nest cameras, Fitbit coaching, ad-free YouTube for yourself}, Google AI Pro at $19.99 usually beats buying pieces — those pieces alone would cost roughly $9.99 + $10 + $9.99 + $8.99 ≈ $39. <a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Compare AI plans</a></dd>
+      <dt>Annual billing is the quiet 15%.</dt>
+      <dd>YouTube Premium individual annual is $159.99 (~$13.33/mo, saving ~$32/yr); Google One annual saves up to 16%. Family YouTube has no US annual option.</dd>
+    </dl></div>
+  </div>
+</section>
+
+<!-- ================================ SOURCES ================================ -->
+<section class="view" id="view-sources">
+  <div class="wrap">
+    <h2>Sources &amp; caveats</h2>
+    <div class="sources">
+      <p>Compiled July 5, 2026 from Google's official pages, plus press coverage of the April/June 2026 YouTube price change (9to5Google, TechCrunch) and Google I/O 2026 bundle announcements.</p>
+      <ul>
+        <li><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google One — plans &amp; pricing</a></li>
+        <li><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI plans (Plus / Pro / Ultra)</a></li>
+        <li><a href="https://support.google.com/googleone/answer/14534406" target="_blank" rel="noopener">Google One Help — Google AI Pro benefits</a></li>
+        <li><a href="https://support.google.com/googleone/answer/16105039" target="_blank" rel="noopener">Google One Help — benefit restrictions (what doesn't share to family)</a></li>
+        <li><a href="https://support.google.com/googleone/answer/15808277" target="_blank" rel="noopener">Google One Help — YouTube Premium add-on rules</a></li>
+        <li><a href="https://support.google.com/googleone/answer/17101453" target="_blank" rel="noopener">Google One Help — Home Premium &amp; Health Premium with AI plans</a></li>
+        <li><a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">YouTube Help — family plan &amp; household rules</a></li>
+        <li><a href="https://fi.google.com/about/plans" target="_blank" rel="noopener">Google Fi — plans &amp; bundled perks</a></li>
+        <li><a href="https://support.google.com/fi/answer/12999259" target="_blank" rel="noopener">Google Fi Help — 6-month YouTube Premium offer</a></li>
+        <li><a href="https://tv.youtube.com/learn/nflsundayticket/" target="_blank" rel="noopener">YouTube TV — NFL Sunday Ticket pricing &amp; sharing</a></li>
+        <li><a href="https://support.google.com/googleone/answer/9003266" target="_blank" rel="noopener">Google One Help — claiming benefits (10% Google Store credit)</a></li>
+        <li><a href="https://support.google.com/youtube/answer/10217125" target="_blank" rel="noopener">YouTube Help — checking your billing channel (Apple vs Google)</a></li>
+        <li><a href="https://support.google.com/googleplay/answer/7018481" target="_blank" rel="noopener">Google Play Help — cancelling Play-billed subscriptions</a></li>
+        <li><a href="https://support.google.com/googleone/answer/15801606" target="_blank" rel="noopener">Google One Help — third-party (carrier-billed) subscriptions</a></li>
+        <li><a href="https://www.engadget.com/2204595/you-might-be-paying-more-for-youtube-premium-through-apple-subscription/" target="_blank" rel="noopener">Engadget — the Apple-billing markup on YouTube Premium</a></li>
+        <li><a href="https://9to5google.com/2026/01/15/google-one-2026-offer/" target="_blank" rel="noopener">9to5Google — January 2026 half-price first-year offer</a></li>
+      </ul>
+      <p><b>Caveats:</b></p>
+      <ul>
+        <li>Only one claim in this dataset completed full adversarial verification (Google One Basic pricing); the rest are single-source extractions from the pages above. Treat <span class="badge u">check</span> items with extra care.</li>
+        <li>Storage on AI plans varies by membership: Google AI Plus is sold in 400 GB and 2 TB variants, AI Pro in 5 TB and 10 TB, AI Ultra in 20 TB and 30 TB (per Google's Store-credit eligibility page). The optimizer assumes the variant shown in each row.</li>
+        <li>Prices are US-only and exclude taxes/fees; promotional pricing (Fi 50%-off, YouTube TV intro) is noted but not counted in steady-state totals.</li>
+      </ul>
+    </div>
+    <footer class="site">
+      <p>Open source under the MIT license. Not affiliated with, endorsed by, or sponsored by Google LLC. Google One, Gemini, YouTube, Nest, Fitbit, Google Fi, and related marks are trademarks of Google LLC; they're used here only to identify the products being compared. Prices change — always confirm on the official page before subscribing.</p>
+    </footer>
+  </div>
+</section>
+</main>
+
+<button class="totalbar" id="totalbar" aria-label="Scroll to your receipt">
+  <span>Your cheapest stack</span>
+  <span class="mono" id="tb-amt">$0/mo</span>
+</button>
+
+<nav class="bottomnav" aria-label="Sections">
+  <div class="items">
+    <a class="bnav" href="#/" data-route="optimizer"><span class="pill"><svg viewBox="0 0 24 24"><path d="M6 2h12a1 1 0 0 1 1 1v19l-2.5-1.7L14 22l-2-1.4L10 22l-2.5-1.7L5 22V3a1 1 0 0 1 1-1Zm2 5v2h8V7H8Zm0 4v2h8v-2H8Zm0 4v2h5v-2H8Z"/></svg></span>Optimizer</a>
+    <a class="bnav" href="#/plans" data-route="plans"><span class="pill"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"/></svg></span>Plans</a>
+    <a class="bnav" href="#/traps" data-route="traps"><span class="pill"><svg viewBox="0 0 24 24"><path d="M1 21 12 2l11 19H1Zm11-3q.425 0 .713-.288T13 17q0-.425-.287-.712T12 16q-.425 0-.712.288T11 17q0 .425.288.713T12 18Zm-1-3h2v-5h-2v5Z"/></svg></span>Traps</a>
+    <a class="bnav" href="#/sources" data-route="sources"><span class="pill"><svg viewBox="0 0 24 24"><path d="M6.5 2H20a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5A3.5 3.5 0 0 1 3 18.5v-13A3.5 3.5 0 0 1 6.5 2ZM5 18.5A1.5 1.5 0 0 0 6.5 20H19v-3H6.5A1.5 1.5 0 0 0 5 18.5ZM6.5 4A1.5 1.5 0 0 0 5 5.5v9.837A3.486 3.486 0 0 1 6.5 15H19V4H6.5Z"/></svg></span>Sources</a>
+  </div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= theme (light default) ================= */
+const root=document.documentElement;
+try{ if(localStorage.getItem("theme")==="dark") root.dataset.theme="dark"; }catch(e){}
+document.getElementById("themeToggle").addEventListener("click",()=>{
+  const next=root.dataset.theme==="dark"?"light":"dark";
+  root.dataset.theme=next;
+  try{ localStorage.setItem("theme",next); }catch(e){}
+});
+
+/* ================= app bar elevation ================= */
+const appbar=document.getElementById("appbar");
+addEventListener("scroll",()=>appbar.classList.toggle("scrolled",scrollY>4),{passive:true});
+
+/* ================= SPA router ================= */
+const ROUTES={optimizer:"view-optimizer",plans:"view-plans",traps:"view-traps",sources:"view-sources"};
+const TITLES={optimizer:"Optimizer",plans:"Plans & bundles",traps:"Double-pay traps",sources:"Sources"};
+function route(){
+  const hash=location.hash.replace(/^#\/?/,"");
+  const name=ROUTES[hash]?hash:"optimizer";
+  for(const [r,id] of Object.entries(ROUTES))
+    document.getElementById(id).classList.toggle("active",r===name);
+  document.querySelectorAll("[data-route]").forEach(el=>{
+    if(el.dataset.route===name) el.setAttribute("aria-current","page");
+    else el.removeAttribute("aria-current");
+  });
+  document.getElementById("totalbar").style.display = name==="optimizer"?"":"none";
+  document.title=TITLES[name]+" · Google Subscriptions, Untangled";
+  scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+
+/* ================= optimizer data ================= */
+const L={
+  one:"https://one.google.com/about/plans",
+  ai:"https://one.google.com/about/google-ai-plans/",
+  ytp:"https://www.youtube.com/premium",
+  ytm:"https://music.youtube.com",
+  yttv:"https://tv.youtube.com",
+  homeHealth:"https://support.google.com/googleone/answer/17101453",
+  fi:"https://fi.google.com/about/plans",
+  restrictions:"https://support.google.com/googleone/answer/16105039"
+};
+const state={people:"1",storage:"100",youtube:"none",ai:"0",home:"none",health:"no",fi:false,yttv:false,billing:"monthly"};
+const fmt=v=>"$"+(Math.round(v*100)/100).toFixed(2);
+const FI={1:65,2:110,3:135,4:160,5:200,6:240};
+
+/* annualYr = full annual price where Google sells one; effective monthly is derived */
+const ANCHORS=[
+  {id:"none",name:"No anchor plan",link:null,price:0,gb:15,ai:0,ytLite:false,ytFull:false,homeStd:false,homeAdv:false,health:false},
+  {id:"aiplus",name:"Google AI Plus",link:L.one,price:9.99,gb:2048,ai:1,ytLite:false,ytFull:false,homeStd:false,homeAdv:false,health:false,storePerk:true,
+   note:"AI Plus is sold in 400 GB and 2 TB variants depending on membership — this assumes the 2 TB variant; verify which one you're offered."},
+  {id:"aipro",name:"Google AI Pro",link:L.ai,price:19.99,annualYr:199.99,gb:5120,ai:2,ytLite:true,ytFull:false,homeStd:true,homeAdv:false,health:true,storePerk:true},
+  {id:"aiultra",name:"Google AI Ultra",link:L.ai,price:100,gb:20480,ai:3,ytLite:true,ytFull:true,homeStd:true,homeAdv:true,health:true,storePerk:true,
+   note:"$100/mo is the new lower Ultra tier (May 2026); the original top tier costs more."}
+];
+const STORAGE_TIERS=[
+  {gb:100,name:"Google One Basic (100 GB)",price:1.99,annualYr:19.99,link:L.one},
+  {gb:200,name:"Google One 200 GB",price:2.99,annualYr:29.99,link:L.one},
+  {gb:2048,name:"Google AI Plus (2 TB)",price:9.99,link:L.one},
+  {gb:5120,name:"Google One 5 TB",price:24.99,link:L.one}
+];
+/* returns {m: monthly-equivalent price, why: billing suffix or ""} */
+function cost(item){
+  if(state.billing==="annual"&&item.annualYr)
+    return {m:item.annualYr/12, why:"billed annually ("+fmt(item.annualYr)+"/yr, ~"+Math.round((1-item.annualYr/12/item.price)*100)+"% off)"};
+  return {m:item.price, why:""};
+}
+const storageAddon=(need,have)=> need<=have?null:(STORAGE_TIERS.find(t=>t.gb>=need)||STORAGE_TIERS[STORAGE_TIERS.length-1]);
+const gbLabel=gb=>gb>=1024?(gb/1024)+" TB":gb+" GB";
+
+function anchorWhy(a){
+  const p=[gbLabel(a.gb)+" storage"];
+  if(a.ai===1)p.push("Gemini 2×"); if(a.ai===2)p.push("Gemini Pro 4× + Deep Research"); if(a.ai===3)p.push("Gemini max limits");
+  if(a.ytFull)p.push("YT Premium"); else if(a.ytLite)p.push("YT Lite");
+  if(a.homeAdv)p.push("Home Adv."); else if(a.homeStd)p.push("Home Std.");
+  if(a.health)p.push("Health");
+  return p.join(" · ");
+}
+
+function build(anchor){
+  if(+state.ai>anchor.ai) return null;
+  const lines=[],notes=[];
+  const ac=cost(anchor);
+  let total=ac.m;
+  if(anchor.price>0) lines.push({item:anchor.name,link:anchor.link,why:anchorWhy(anchor)+(ac.why?" · "+ac.why:""),price:ac.m});
+  if(anchor.note) notes.push(anchor.note);
+  if(anchor.storePerk) notes.push("Perk: 10% back in Google Store credit on device & accessory purchases (US/CA/UK/DE/AU; credit expires after 365 days).");
+
+  const needGB=+state.storage, fiGB=state.fi?100:0;
+  const st=storageAddon(needGB,Math.max(anchor.gb,fiGB));
+  if(st){ const sc=cost(st); lines.push({item:st.name,link:st.link,why:"covers your storage need"+(sc.why?" · "+sc.why:""),price:sc.m}); total+=sc.m; }
+  else if(needGB>15&&anchor.gb>=needGB) lines.push({item:"Storage: covered",why:gbLabel(anchor.gb)+" included, shareable ×5",price:0});
+  else if(needGB>15&&fiGB>=needGB) lines.push({item:"Storage: covered by Fi",why:"100 GB Google One included with Unlimited Premium",price:0});
+
+  const yt=state.youtube;
+  if(yt==="lite"){
+    if(anchor.ytFull) lines.push({item:"Ad-free YouTube: covered",why:"full Premium included (manager only)",price:0});
+    else if(anchor.ytLite){ lines.push({item:"Ad-free YouTube: covered",why:"Premium Lite included (manager only)",price:0});
+      notes.push("Bundled Lite skips YouTube Music; ads may remain on Shorts and music videos. Full Premium is $15.99 (Google offers AI Pro members upgrade discounts)."); }
+    else { lines.push({item:"YouTube Premium Lite",link:L.ytp,why:"ad-free regular videos",price:8.99}); total+=8.99;
+      notes.push("For $7 more, full Premium ($15.99, or $13.33/mo billed annually) adds Music, downloads and background play."); }
+  } else if(yt==="full"){
+    if(anchor.ytFull) lines.push({item:"YouTube Premium: covered",why:"individual plan included (manager only)",price:0});
+    else if(anchor.ytLite){ lines.push({item:"YouTube Music Premium",link:L.ytm,why:"Lite is bundled; Music fills the gap",price:11.99}); total+=11.99;
+      notes.push("Lite (bundled) + Music ($11.99) beats standalone Premium ($15.99) by $4 — but check AI Pro upgrade discounts to full Premium first."); }
+    else { const yc=cost({price:15.99,annualYr:159.99});
+      lines.push({item:"YouTube Premium (individual)",link:L.ytp,why:yc.why||"annual $159.99 saves ~$32/yr — web only",price:yc.m}); total+=yc.m; }
+  } else if(yt==="family"){
+    lines.push({item:"YouTube Premium Family",link:L.ytp,why:"6 people, one address — the only family option",price:26.99}); total+=26.99;
+    if(anchor.ytFull||anchor.ytLite) notes.push("The YouTube perk bundled with your AI plan is manager-only and won't stack — the family plan is what covers everyone.");
+    if(state.people==="split") notes.push("⚠ Family members at different addresses fail YouTube's 30-day household check. People elsewhere need their own individual plans ($15.99 each).");
+  }
+
+  if(state.home==="std"){
+    if(anchor.homeStd) lines.push({item:"Home Premium Standard: covered",why:"included with "+anchor.name,price:0});
+    else { lines.push({item:"Google Home Premium — Standard",link:L.homeHealth,why:"formerly Nest Aware",price:10}); total+=10; }
+  } else if(state.home==="adv"){
+    if(anchor.homeAdv) lines.push({item:"Home Premium Advanced: covered",why:"included with "+anchor.name,price:0});
+    else { lines.push({item:"Google Home Premium — Advanced",link:L.homeHealth,why:anchor.homeStd?"add-on (Standard already included)":"24/7 recording",price:20}); total+=20;
+      if(anchor.homeStd) notes.push("AI Pro includes Standard; Advanced is sold as a paid add-on — the add-on may cost less than the $20 standalone price shown."); }
+  }
+
+  if(state.health==="yes"){
+    if(anchor.health) lines.push({item:"Health Premium: covered",why:"included with "+anchor.name,price:0});
+    else { const hc=cost({price:9.99,annualYr:99.99});
+      lines.push({item:"Google Health Premium",link:L.homeHealth,why:hc.why||"$99.99/yr annual (~$8.33/mo)",price:hc.m}); total+=hc.m; }
+  }
+
+  if(state.fi){
+    const n=state.people==="1"?1:4, p=FI[n];
+    lines.push({item:"Google Fi Unlimited Premium ("+n+(n>1?" lines":" line")+")",link:L.fi,why:"bundles 100 GB One + 6-mo YouTube Premium trial",price:p}); total+=p;
+    notes.push("Fi's free YouTube Premium lasts 6 months, then converts to paid ($15.99/mo) until cancelled. Family assumed at 4 lines — adjust: 2/$110 · 3/$135 · 5/$200 · 6/$240.");
+  }
+  if(state.yttv){ lines.push({item:"YouTube TV",link:L.yttv,why:"$67.99/mo for first 3 months",price:82.99}); total+=82.99; }
+
+  if((state.people==="family"||state.people==="split")&&anchor.price>0)
+    notes.push("Storage"+(anchor.ai>0?" and AI features":"")+" on "+anchor.name+" share with up to 5 family members at any address — each gets their own AI limits.");
+  if(state.billing==="annual")
+    notes.push("Annual pricing is web-only and applied where Google sells it; everything else stays monthly.");
+  if(state.youtube!=="none")
+    notes.push("Subscribe on the web, never inside the iOS app — App Store billing runs ~$5/mo higher for YouTube Premium.");
+
+  return {anchor,lines,notes,total};
+}
+
+function naiveTotal(){
+  let t=0;
+  t+=ANCHORS.find(a=>a.ai===+state.ai).price;
+  const st=storageAddon(+state.storage,15); if(st)t+=st.price;
+  if(state.youtube==="lite")t+=8.99;
+  if(state.youtube==="full")t+=15.99;
+  if(state.youtube==="family")t+=26.99;
+  if(state.home==="std")t+=10;
+  if(state.home==="adv")t+=20;
+  if(state.health==="yes")t+=9.99;
+  if(state.fi)t+=FI[state.people==="1"?1:4];
+  if(state.yttv)t+=82.99;
+  return t;
+}
+
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function render(){
+  const results=ANCHORS.map(build).filter(Boolean).sort((a,b)=>a.total-b.total);
+  const best=results[0];
+
+  const head=document.getElementById("r-anchor");
+  head.innerHTML = best.anchor.price>0
+    ? 'Anchored on <a href="'+best.anchor.link+'" target="_blank" rel="noopener">'+esc(best.anchor.name)+'</a>'
+    : "No bundle needed";
+
+  const body=document.getElementById("r-lines");
+  body.innerHTML="";
+  if(best.lines.length===0){
+    body.innerHTML='<div class="rline"><span class="item">Nothing to buy — the free tier covers you.</span><span class="price free">$0</span></div>';
+  }
+  for(const l of best.lines){
+    const name=l.link?'<a href="'+l.link+'" target="_blank" rel="noopener">'+esc(l.item)+'</a>':esc(l.item);
+    const d=document.createElement("div"); d.className="rline";
+    d.innerHTML='<span class="item"><b>'+name+'</b>'+(l.why?'<span class="why">'+esc(l.why)+'</span>':'')+'</span>'
+      +'<span class="price'+(l.price===0?' free':'')+'">'+(l.price===0?'included':fmt(l.price))+'</span>';
+    body.appendChild(d);
+  }
+  const totalTxt=fmt(best.total).replace(/\.00$/,"");
+  document.getElementById("r-total").innerHTML=totalTxt+"<small>/mo</small>";
+  document.getElementById("tb-amt").textContent=totalTxt+"/mo";
+
+  const sv=document.getElementById("r-savings");
+  const naive=naiveTotal(), diff=naive-best.total;
+  if(diff>0.5){ sv.hidden=false;
+    sv.innerHTML="<b>Saves "+fmt(diff)+"/mo ("+fmt(diff*12)+"/yr)</b> vs buying each piece separately ("+fmt(naive)+"/mo) — the bundle covers the overlap.";
+  } else sv.hidden=true;
+
+  const notes=document.getElementById("r-notes"); notes.innerHTML="";
+  for(const n of best.notes){ const li=document.createElement("li"); li.textContent=n; notes.appendChild(li); }
+
+  const alts=document.getElementById("r-alts");
+  alts.innerHTML=results.length>1
+    ? "<b>Other anchors priced out:</b>"+results.slice(1).map(r=>
+        '<div class="row"><span>'+esc(r.anchor.name)+'</span><span>'+fmt(r.total)+'/mo</span></div>').join("")
+    : "";
+}
+
+/* ================= wiring ================= */
+document.querySelectorAll(".chips[data-q]").forEach(group=>{
+  group.addEventListener("click",e=>{
+    const btn=e.target.closest(".chip"); if(!btn)return;
+    group.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+    btn.setAttribute("aria-pressed","true");
+    state[group.dataset.q]=btn.dataset.v;
+    render();
+  });
+});
+document.getElementById("x-fi").addEventListener("change",e=>{state.fi=e.target.checked;render();});
+document.getElementById("x-yttv").addEventListener("change",e=>{state.yttv=e.target.checked;render();});
+document.getElementById("totalbar").addEventListener("click",()=>
+  document.getElementById("receipt").scrollIntoView({behavior:"smooth",block:"start"}));
+
+route();
+render();
+})();
+</script>
+</body>
+</html>
