@@ -125,17 +125,8 @@ h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
 /* ================= optimizer ================= */
 .optimizer{display:grid; grid-template-columns:minmax(0,1fr) 372px; gap:24px; align-items:start; margin-top:24px}
 .qcard{background:var(--surface); border:1px solid var(--outline-var); border-radius:16px; padding:20px 22px}
-/* ---- question swiper ---- */
-.qviewport{overflow:hidden; touch-action:pan-y}
-.qtrack{display:flex; align-items:stretch; transition:transform .28s cubic-bezier(.2,0,0,1)}
-.qtrack .qcard{flex:0 0 100%; min-width:100%}
-.qnav{display:flex; align-items:center; gap:10px; margin-top:14px}
-.qnav .iconbtn{border:1px solid var(--outline-var)}
-.qnav .iconbtn:disabled{opacity:.35; cursor:default; background:none}
-.qdots{display:flex; gap:8px; flex:1; justify-content:center}
-.qdot{width:8px; height:8px; border-radius:50%; border:none; padding:0; background:var(--outline-var); cursor:pointer; transition:background .15s, width .15s}
-.qdot[aria-current="true"]{background:var(--primary); width:22px; border-radius:4px}
-.qcount{font-size:13px; color:var(--on-variant); min-width:44px; text-align:right}
+.qcard + .qcard{margin-top:14px}
+.qcard.answered-flash{border-color:var(--primary)}
 .chip .mini{font-size:10px; letter-spacing:.04em; text-transform:uppercase; background:var(--green-c); color:var(--on-green-c); border-radius:4px; padding:1px 5px; font-weight:700}
 .qlabel{font-weight:500; margin:0 0 3px; font-size:16px}
 .qhint{color:var(--on-variant); font-size:13px; margin:0 0 14px}
@@ -189,10 +180,20 @@ h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
 .receipt-total .amt{font-size:28px; font-weight:500; font-family:var(--font-mono)}
 .receipt-total .amt small{font-size:13px; color:var(--on-variant); font-weight:400}
 .savings{margin:0 20px 14px; padding:10px 14px; border-radius:10px; background:var(--green-c); color:var(--on-green-c); font-size:13.5px; line-height:1.5}
+.rdetails{border-top:1px dashed var(--outline-var)}
+.rdetails summary{
+  list-style:none; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:12px 20px; cursor:pointer; font-size:13px; font-weight:500; color:var(--on-variant);
+}
+.rdetails summary::-webkit-details-marker{display:none}
+.rdetails summary:hover{background:var(--surface-2)}
+.rdetails summary svg{transition:transform .15s}
+.rdetails[open] summary svg{transform:rotate(180deg)}
 .rnotes{padding:0 20px 14px; color:var(--on-variant); font-size:12.5px; line-height:1.55}
 .rnotes ul{margin:0; padding-left:16px}
 .rnotes li{margin:5px 0}
 .alts{padding:12px 20px 18px; border-top:1px solid var(--surface-3); font-size:13px; color:var(--on-variant)}
+.alts:empty{display:none}
 .alts .row{display:flex; justify-content:space-between; padding:3px 0; font-family:var(--font-mono)}
 .alts b{font-family:var(--font-sans)}
 
@@ -316,9 +317,7 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
     </header>
 
     <div class="optimizer">
-      <div class="questions">
-        <div class="qviewport" id="qviewport">
-        <div class="qtrack" id="qtrack">
+      <div class="questions" id="questions">
         <div class="qcard">
           <p class="qlabel">Who is this for?</p>
           <p class="qhint">Family YouTube plans require everyone at the same home address — <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">checked every 30 days</a>.</p>
@@ -390,14 +389,6 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
             <label class="chk"><input type="checkbox" id="x-yttv"> YouTube TV (live TV)</label>
           </div>
         </div>
-        </div><!-- /qtrack -->
-        </div><!-- /qviewport -->
-        <div class="qnav">
-          <button class="iconbtn" id="qprev" aria-label="Previous question"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M15.4 18.6 9 12.2l6.4-6.4 1.4 1.4-5 5 5 5Z"/></svg></button>
-          <div class="qdots" id="qdots"></div>
-          <span class="qcount" id="qcount">1 / 7</span>
-          <button class="iconbtn" id="qnext" aria-label="Next question"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="m8.6 18.6-1.4-1.4 5-5-5-5L8.6 5.8l6.4 6.4Z"/></svg></button>
-        </div>
       </div>
 
       <aside class="receipt" id="receipt" aria-live="polite">
@@ -415,8 +406,13 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
           <span class="amt" id="r-total">$0<small>/mo</small></span>
         </div>
         <div class="savings" id="r-savings" hidden></div>
-        <div class="rnotes"><ul id="r-notes"></ul></div>
-        <div class="alts" id="r-alts"></div>
+        <details class="rdetails" id="r-details">
+          <summary><span id="r-details-label">Notes &amp; other options</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 15.4 6 9.4l1.4-1.4 4.6 4.6 4.6-4.6L18 9.4Z"/></svg>
+          </summary>
+          <div class="rnotes"><ul id="r-notes"></ul></div>
+          <div class="alts" id="r-alts"></div>
+        </details>
       </aside>
     </div>
   </div>
@@ -886,6 +882,11 @@ function render(){
     ? "<b>Other anchors priced out:</b>"+results.slice(1).map(r=>
         '<div class="row"><span>'+esc(r.anchor.name)+'</span><span>'+fmt(r.total)+'/mo</span></div>').join("")
     : "";
+
+  const details=document.getElementById("r-details");
+  details.hidden=best.notes.length===0&&results.length<=1;
+  document.getElementById("r-details-label").textContent=
+    "Notes & other options"+(best.notes.length?" ("+best.notes.length+")":"");
 }
 
 /* ================= auto-include cascade =================
@@ -934,36 +935,16 @@ function paintChips(){
 }
 function recompute(){ syncConstraints(); applyIncludes(); paintChips(); render(); }
 
-/* ================= question swiper ================= */
-const track=document.getElementById("qtrack");
-const slides=[...track.children];
-const dots=document.getElementById("qdots");
-slides.forEach((_,i)=>{
-  const d=document.createElement("button"); d.className="qdot";
-  d.setAttribute("aria-label","Question "+(i+1));
-  d.addEventListener("click",()=>go(i));
-  dots.appendChild(d);
-});
-let qIndex=0;
-function go(i){
-  qIndex=Math.max(0,Math.min(slides.length-1,i));
-  track.style.transform="translateX(-"+(qIndex*100)+"%)";
-  document.getElementById("qcount").textContent=(qIndex+1)+" / "+slides.length;
-  document.getElementById("qprev").disabled=qIndex===0;
-  document.getElementById("qnext").disabled=qIndex===slides.length-1;
-  [...dots.children].forEach((d,j)=>d.setAttribute("aria-current",String(j===qIndex)));
+/* scroll the next question card into view after this one is answered */
+function advanceFrom(card){
+  const next=card.nextElementSibling;
+  if(!next||!next.classList.contains("qcard"))return;
+  setTimeout(()=>{
+    next.scrollIntoView({behavior:"smooth",block:"center"});
+    next.classList.add("answered-flash");
+    setTimeout(()=>next.classList.remove("answered-flash"),900);
+  },200);
 }
-document.getElementById("qprev").addEventListener("click",()=>go(qIndex-1));
-document.getElementById("qnext").addEventListener("click",()=>go(qIndex+1));
-/* swipe */
-const viewport=document.getElementById("qviewport");
-let swipeX=null;
-viewport.addEventListener("pointerdown",e=>{swipeX=e.clientX;},{passive:true});
-viewport.addEventListener("pointerup",e=>{
-  if(swipeX===null)return;
-  const dx=e.clientX-swipeX; swipeX=null;
-  if(Math.abs(dx)>44) go(qIndex+(dx<0?1:-1));
-},{passive:true});
 
 /* ================= wiring ================= */
 document.querySelectorAll(".chips[data-q]").forEach(group=>{
@@ -974,8 +955,9 @@ document.querySelectorAll(".chips[data-q]").forEach(group=>{
     if(q==="people") state.people=btn.dataset.v;
     else if(!(q in manual)) state[q]=btn.dataset.v;   /* ai, billing */
     recompute();
-    /* auto-advance to the next question, but not from the receipt's billing toggle */
-    if(group.closest(".qtrack")&&qIndex<slides.length-1) setTimeout(()=>go(qIndex+1),260);
+    /* auto-scroll to the next question, but not from the receipt's billing toggle */
+    const card=group.closest(".qcard");
+    if(card&&card.closest("#questions")) advanceFrom(card);
   });
 });
 document.getElementById("x-fi").addEventListener("change",e=>{state.fi=e.target.checked;render();});
@@ -995,7 +977,6 @@ document.addEventListener("click",e=>{
 });
 
 route();
-go(0);
 recompute();
 })();
 </script>
