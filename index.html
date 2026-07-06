@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <title>Google Subscriptions, Untangled</title>
 <meta name="description" content="An interactive optimizer for Google's subscription maze — answer six questions and get the cheapest combination of Google One, AI, YouTube, Nest, Fitbit and Fi plans.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='7' cy='7' r='4' fill='%234285f4'/%3E%3Ccircle cx='17' cy='7' r='4' fill='%23ea4335'/%3E%3Ccircle cx='7' cy='17' r='4' fill='%23fbbc04'/%3E%3Ccircle cx='17' cy='17' r='4' fill='%2334a853'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 A9 9 0 0 1 21 12' fill='none' stroke='%234285f4' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M21 12 A9 9 0 0 1 12 21' fill='none' stroke='%2334a853' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M12 21 A9 9 0 0 1 3 12' fill='none' stroke='%23fbbc04' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M3 12 A9 9 0 0 1 12 3' fill='none' stroke='%23ea4335' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M12 0.5 L16 3 L12 5.5 Z' fill='%234285f4'/%3E%3Ctext x='12' y='16' font-size='10.5' font-weight='700' text-anchor='middle' fill='%235f6368' font-family='Arial,sans-serif'%3E%24%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -124,6 +124,8 @@ h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
   transition:background .12s,border-color .12s,color .12s;
 }
 .chip:hover{background:var(--surface-2)}
+.chip:disabled{opacity:.4; cursor:not-allowed}
+.chip:disabled:hover{background:var(--surface)}
 .chip .tick{display:none; width:16px; height:16px; fill:currentColor}
 .chip[aria-pressed="true"]{background:var(--primary-container); color:var(--on-primary-container); border-color:transparent}
 .chip[aria-pressed="true"] .tick{display:block}
@@ -156,6 +158,8 @@ h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
 .rline .why a{font-size:inherit}
 .rline .price{white-space:nowrap; font-weight:500; font-family:var(--font-mono)}
 .rline .price.free{color:var(--green)}
+.rline .price s, .receipt-total .amt s{color:var(--on-variant); font-weight:400; opacity:.75; margin-right:6px}
+.receipt-total .amt s{font-size:16px}
 .receipt-total{padding:14px 20px; border-top:1px dashed var(--outline-var); display:flex; justify-content:space-between; align-items:baseline}
 .receipt-total .t{font-weight:500}
 .receipt-total .amt{font-size:28px; font-weight:500; font-family:var(--font-mono)}
@@ -246,9 +250,13 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
 <header class="appbar" id="appbar">
   <div class="appbar-inner">
     <a class="brand" href="#/">
-      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="7" cy="7" r="4" fill="var(--gblue)"/><circle cx="17" cy="7" r="4" fill="var(--gred)"/>
-        <circle cx="7" cy="17" r="4" fill="var(--gyellow)"/><circle cx="17" cy="17" r="4" fill="var(--ggreen)"/>
+      <svg width="27" height="27" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 A9 9 0 0 1 21 12" fill="none" stroke="var(--gblue)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M21 12 A9 9 0 0 1 12 21" fill="none" stroke="var(--ggreen)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M12 21 A9 9 0 0 1 3 12" fill="none" stroke="var(--gyellow)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M3 12 A9 9 0 0 1 12 3" fill="none" stroke="var(--gred)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M12 0.5 L16 3 L12 5.5 Z" fill="var(--gblue)"/>
+        <text x="12" y="16" font-size="10.5" font-weight="700" text-anchor="middle" fill="currentColor" font-family="Roboto,Arial,sans-serif">$</text>
       </svg>
       <span>Subscriptions<span class="lite">, untangled</span></span>
     </a>
@@ -459,7 +467,7 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
         <p>Google AI Plus, AI Pro, and AI Ultra members earn 10% back as Google Store credit on device and accessory purchases (US, CA, UK, DE, AU). Credit lands ~24h after your order ships and <b>expires after 365 days</b>. Buying a $999 Pixel effectively rebates ~$100 — worth timing hardware purchases after you subscribe.</p>
         <a class="more" href="https://support.google.com/googleone/answer/9003266" target="_blank" rel="noopener">Read more — claim Google One benefits</a></div>
       <div class="trap" style="border-left-color:var(--ggreen)"><h3>Annual billing: the quiet 15–17%</h3>
-        <p>Where Google sells an annual plan, it prices at roughly ten months: Google One Basic $19.99/yr (vs $23.88 monthly), 200 GB $29.99/yr, AI Pro $199.99/yr (~$16.67/mo vs $19.99), YouTube Premium individual $159.99/yr (~$13.33/mo vs $15.99), Health Premium $99.99/yr, Play Pass $29.99/yr. Annual is <b>web-only</b> — the mobile apps mostly push monthly. YouTube Family, Lite, and Music have no US annual option.</p>
+        <p>Where Google sells an annual plan, it prices at roughly ten months: Google One Basic $19.99/yr (vs $23.88 monthly), 200 GB $29.99/yr, AI Pro $199.99/yr (~$16.67/mo vs $19.99), YouTube Premium individual $159.99/yr (~$13.33/mo vs $15.99), Health Premium $99.99/yr, Play Pass $29.99/yr. Annual is <b>web-only</b> — the mobile apps mostly push monthly. YouTube Family, Lite, and Music have no US annual option. One catch: annual is prepaid and <b>not refunded pro-rata</b> — cancelling mid-year keeps your benefits until the year ends, it doesn't return money.</p>
         <a class="more" href="https://one.google.com/about/plans" target="_blank" rel="noopener">Compare on the web</a></div>
       <div class="trap" style="border-left-color:var(--ggreen)"><h3>The January sale &amp; other recurring promos</h3>
         <p>Google has run a New-Year 50%-off-first-year sale (ended Jan 15, 2026: AI Pro $99.99/yr, Basic $9.99/yr) — if you're subscribing in December, wait. Also recurring: Fi's bring-a-Pixel 50%-off-12-months offer, YouTube TV's $67.99 intro (first 3 months), NFL Sunday Ticket presale pricing ($240 new vs $480 returning), student rates (YouTube Premium $8.99, Sunday Ticket $119), and free-trial months bundled with new Pixel devices.</p>
@@ -549,8 +557,8 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
         <span class="fix">Fix: cancel the Apple-billed plan, re-subscribe in Safari on the web at the normal price.</span>
         <a class="more" href="https://support.google.com/youtube/answer/10217125" target="_blank" rel="noopener">Read more — check where you're billed</a></div>
       <div class="trap"><h3>Paying monthly when annual exists</h3>
-        <p>Google prices annual plans at roughly ten months: YouTube Premium $159.99/yr vs $191.88 paid monthly, AI Pro $199.99 vs $239.88, Google One Basic $19.99 vs $23.88. The apps rarely surface annual — it's on the web.</p>
-        <span class="fix">Fix: flip the optimizer's billing toggle to "Annual" and subscribe on the web.</span>
+        <p>Google prices annual plans at roughly ten months: YouTube Premium $159.99/yr vs $191.88 paid monthly, AI Pro $199.99 vs $239.88, Google One Basic $19.99 vs $23.88. The apps rarely surface annual — it's on the web. Just know it's prepaid: cancel mid-year and you keep benefits until the year ends, with no pro-rated refund.</p>
+        <span class="fix">Fix: flip the optimizer's billing toggle to "Annual" and subscribe on the web — but only for plans you'll keep the full year.</span>
         <a class="more" href="https://one.google.com/about/plans" target="_blank" rel="noopener">Compare annual pricing</a></div>
     </div>
 
@@ -685,10 +693,10 @@ const STORAGE_TIERS=[
   {gb:2048,name:"Google AI Plus (2 TB)",price:9.99,link:L.one},
   {gb:5120,name:"Google One 5 TB",price:24.99,link:L.one}
 ];
-/* returns {m: monthly-equivalent price, why: billing suffix or ""} */
+/* returns {m: monthly-equivalent price, why: billing suffix or "", was: struck-through monthly price when annual applies} */
 function cost(item){
   if(state.billing==="annual"&&item.annualYr)
-    return {m:item.annualYr/12, why:"billed annually ("+fmt(item.annualYr)+"/yr, ~"+Math.round((1-item.annualYr/12/item.price)*100)+"% off)"};
+    return {m:item.annualYr/12, was:item.price, why:"billed annually ("+fmt(item.annualYr)+"/yr, ~"+Math.round((1-item.annualYr/12/item.price)*100)+"% off)"};
   return {m:item.price, why:""};
 }
 const storageAddon=(need,have)=> need<=have?null:(STORAGE_TIERS.find(t=>t.gb>=need)||STORAGE_TIERS[STORAGE_TIERS.length-1]);
@@ -708,13 +716,13 @@ function build(anchor){
   const lines=[],notes=[];
   const ac=cost(anchor);
   let total=ac.m;
-  if(anchor.price>0) lines.push({item:anchor.name,link:anchor.link,why:anchorWhy(anchor)+(ac.why?" · "+ac.why:""),price:ac.m});
+  if(anchor.price>0) lines.push({item:anchor.name,link:anchor.link,why:anchorWhy(anchor)+(ac.why?" · "+ac.why:""),price:ac.m,was:ac.was});
   if(anchor.note) notes.push(anchor.note);
   if(anchor.storePerk) notes.push("Perk: 10% back in Google Store credit on device & accessory purchases (US/CA/UK/DE/AU; credit expires after 365 days).");
 
   const needGB=+state.storage, fiGB=state.fi?100:0;
   const st=storageAddon(needGB,Math.max(anchor.gb,fiGB));
-  if(st){ const sc=cost(st); lines.push({item:st.name,link:st.link,why:"covers your storage need"+(sc.why?" · "+sc.why:""),price:sc.m}); total+=sc.m; }
+  if(st){ const sc=cost(st); lines.push({item:st.name,link:st.link,why:"covers your storage need"+(sc.why?" · "+sc.why:""),price:sc.m,was:sc.was}); total+=sc.m; }
   else if(needGB>15&&anchor.gb>=needGB) lines.push({item:"Storage: covered",why:gbLabel(anchor.gb)+" included, shareable ×5",price:0});
   else if(needGB>15&&fiGB>=needGB) lines.push({item:"Storage: covered by Fi",why:"100 GB Google One included with Unlimited Premium",price:0});
 
@@ -730,7 +738,7 @@ function build(anchor){
     else if(anchor.ytLite){ lines.push({item:"YouTube Music Premium",link:L.ytm,why:"Lite is bundled; Music fills the gap",price:11.99}); total+=11.99;
       notes.push("Lite (bundled) + Music ($11.99) beats standalone Premium ($15.99) by $4 — but check AI Pro upgrade discounts to full Premium first."); }
     else { const yc=cost({price:15.99,annualYr:159.99});
-      lines.push({item:"YouTube Premium (individual)",link:L.ytp,why:yc.why||"annual $159.99 saves ~$32/yr — web only",price:yc.m}); total+=yc.m; }
+      lines.push({item:"YouTube Premium (individual)",link:L.ytp,why:yc.why||"annual $159.99 saves ~$32/yr — web only",price:yc.m,was:yc.was}); total+=yc.m; }
   } else if(yt==="family"){
     lines.push({item:"YouTube Premium Family",link:L.ytp,why:"6 people, one address — the only family option",price:26.99}); total+=26.99;
     if(anchor.ytFull||anchor.ytLite) notes.push("The YouTube perk bundled with your AI plan is manager-only and won't stack — the family plan is what covers everyone.");
@@ -749,7 +757,7 @@ function build(anchor){
   if(state.health==="yes"){
     if(anchor.health) lines.push({item:"Health Premium: covered",why:"included with "+anchor.name,price:0});
     else { const hc=cost({price:9.99,annualYr:99.99});
-      lines.push({item:"Google Health Premium",link:L.homeHealth,why:hc.why||"$99.99/yr annual (~$8.33/mo)",price:hc.m}); total+=hc.m; }
+      lines.push({item:"Google Health Premium",link:L.homeHealth,why:hc.why||"$99.99/yr annual (~$8.33/mo)",price:hc.m,was:hc.was}); total+=hc.m; }
   }
 
   if(state.fi){
@@ -762,7 +770,7 @@ function build(anchor){
   if((state.people==="family"||state.people==="split")&&anchor.price>0)
     notes.push("Storage"+(anchor.ai>0?" and AI features":"")+" on "+anchor.name+" share with up to 5 family members at any address — each gets their own AI limits.");
   if(state.billing==="annual")
-    notes.push("Annual pricing is web-only and applied where Google sells it; everything else stays monthly.");
+    notes.push("Annual pricing is web-only and applied where Google sells it; everything else stays monthly. Heads-up: annual plans are prepaid — if you cancel mid-year you keep the benefits until the year ends, but Google does not refund the difference pro-rata.");
   if(state.youtube!=="none")
     notes.push("Subscribe on the web, never inside the iOS app — App Store billing runs ~$5/mo higher for YouTube Premium.");
 
@@ -802,13 +810,17 @@ function render(){
   }
   for(const l of best.lines){
     const name=l.link?'<a href="'+l.link+'" target="_blank" rel="noopener">'+esc(l.item)+'</a>':esc(l.item);
+    const priceTxt=l.price===0?'included'
+      :(l.was&&l.was>l.price+0.004?'<s>'+fmt(l.was)+'</s>'+fmt(l.price):fmt(l.price));
     const d=document.createElement("div"); d.className="rline";
     d.innerHTML='<span class="item"><b>'+name+'</b>'+(l.why?'<span class="why">'+esc(l.why)+'</span>':'')+'</span>'
-      +'<span class="price'+(l.price===0?' free':'')+'">'+(l.price===0?'included':fmt(l.price))+'</span>';
+      +'<span class="price'+(l.price===0?' free':'')+'">'+priceTxt+'</span>';
     body.appendChild(d);
   }
   const totalTxt=fmt(best.total).replace(/\.00$/,"");
-  document.getElementById("r-total").innerHTML=totalTxt+"<small>/mo</small>";
+  const totalWas=best.lines.reduce((s,l)=>s+(l.was!=null?l.was:l.price),0);
+  document.getElementById("r-total").innerHTML=
+    (totalWas>best.total+0.005?'<s>'+fmt(totalWas)+'</s>':'')+totalTxt+"<small>/mo</small>";
   document.getElementById("tb-amt").textContent=totalTxt+"/mo";
 
   const sv=document.getElementById("r-savings");
@@ -828,12 +840,24 @@ function render(){
 }
 
 /* ================= wiring ================= */
+function selectChip(group,value){
+  group.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.v===value)));
+  state[group.dataset.q]=value;
+}
+/* "Ad-free for the whole family" only makes sense with 2+ people */
+function syncConstraints(){
+  const ytGroup=document.querySelector('.chips[data-q="youtube"]');
+  const famChip=ytGroup.querySelector('.chip[data-v="family"]');
+  const solo=state.people==="1";
+  famChip.disabled=solo;
+  famChip.title=solo?'Family plans need a family group — pick a "Family" option above first':'';
+  if(solo&&state.youtube==="family") selectChip(ytGroup,"full");
+}
 document.querySelectorAll(".chips[data-q]").forEach(group=>{
   group.addEventListener("click",e=>{
-    const btn=e.target.closest(".chip"); if(!btn)return;
-    group.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed","false"));
-    btn.setAttribute("aria-pressed","true");
-    state[group.dataset.q]=btn.dataset.v;
+    const btn=e.target.closest(".chip"); if(!btn||btn.disabled)return;
+    selectChip(group,btn.dataset.v);
+    syncConstraints();
     render();
   });
 });
@@ -843,6 +867,7 @@ document.getElementById("totalbar").addEventListener("click",()=>
   document.getElementById("receipt").scrollIntoView({behavior:"smooth",block:"start"}));
 
 route();
+syncConstraints();
 render();
 })();
 </script>
