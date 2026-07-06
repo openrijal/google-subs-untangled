@@ -103,16 +103,40 @@ h2{font-size:26px; font-weight:400; margin:56px 0 6px; letter-spacing:-.2px}
 .view > .wrap > h2:first-child{margin-top:40px}
 .sub{color:var(--on-variant); margin:0 0 24px; max-width:68ch}
 .lede{color:var(--on-variant); font-size:18px; margin:0; max-width:62ch}
-.freshness{
-  display:flex; gap:12px; align-items:flex-start; margin:26px 0 8px; padding:14px 16px;
-  background:var(--yellow-c); color:var(--on-yellow-c); border-radius:12px; font-size:13.5px; line-height:1.5;
+.updated{
+  position:relative; display:inline-flex; align-items:center; gap:8px; margin:20px 0 0;
+  border:1px solid var(--outline-var); background:var(--surface); border-radius:999px;
+  padding:6px 8px 6px 14px; font-size:13px; color:var(--on-variant); font-weight:500;
 }
-.freshness svg{flex:none; width:20px; height:20px; fill:currentColor; margin-top:1px}
+.updated .infobtn{
+  width:26px; height:26px; border-radius:50%; border:none; background:none; cursor:pointer;
+  display:grid; place-items:center; color:var(--primary);
+}
+.updated .infobtn:hover{background:var(--surface-2)}
+.updated .infobtn svg{width:18px; height:18px; fill:currentColor}
+.tipbox{
+  position:absolute; top:calc(100% + 10px); left:0; z-index:30; width:min(400px,86vw);
+  background:var(--surface); border:1px solid var(--outline-var); border-radius:12px;
+  padding:14px 16px; font-size:13px; line-height:1.55; color:var(--on-surface); font-weight:400;
+  box-shadow:var(--elev-2);
+}
+.tipbox[hidden]{display:none}
 
 /* ================= optimizer ================= */
 .optimizer{display:grid; grid-template-columns:minmax(0,1fr) 372px; gap:24px; align-items:start; margin-top:24px}
 .qcard{background:var(--surface); border:1px solid var(--outline-var); border-radius:16px; padding:20px 22px}
-.qcard + .qcard{margin-top:14px}
+/* ---- question swiper ---- */
+.qviewport{overflow:hidden; touch-action:pan-y}
+.qtrack{display:flex; align-items:stretch; transition:transform .28s cubic-bezier(.2,0,0,1)}
+.qtrack .qcard{flex:0 0 100%; min-width:100%}
+.qnav{display:flex; align-items:center; gap:10px; margin-top:14px}
+.qnav .iconbtn{border:1px solid var(--outline-var)}
+.qnav .iconbtn:disabled{opacity:.35; cursor:default; background:none}
+.qdots{display:flex; gap:8px; flex:1; justify-content:center}
+.qdot{width:8px; height:8px; border-radius:50%; border:none; padding:0; background:var(--outline-var); cursor:pointer; transition:background .15s, width .15s}
+.qdot[aria-current="true"]{background:var(--primary); width:22px; border-radius:4px}
+.qcount{font-size:13px; color:var(--on-variant); min-width:44px; text-align:right}
+.chip .mini{font-size:10px; letter-spacing:.04em; text-transform:uppercase; background:var(--green-c); color:var(--on-green-c); border-radius:4px; padding:1px 5px; font-weight:700}
 .qlabel{font-weight:500; margin:0 0 3px; font-size:16px}
 .qhint{color:var(--on-variant); font-size:13px; margin:0 0 14px}
 .qhint a{white-space:nowrap}
@@ -279,17 +303,22 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
 <section class="view" id="view-optimizer">
   <div class="wrap">
     <header class="hero">
-      <p class="eyebrow">US pricing · updated July 5, 2026</p>
+      <p class="eyebrow">US pricing</p>
       <h1>One Google bill, without paying twice</h1>
-      <p class="lede">Google sells storage, AI, YouTube, smart-home, health, and phone plans as eight overlapping subscriptions — several of which quietly include each other. Answer six questions and get the cheapest combination that covers what you actually use.</p>
+      <p class="lede">Google sells storage, AI, YouTube, smart-home, health, and phone plans as eight overlapping subscriptions — several of which quietly include each other. Answer seven questions and get the cheapest combination that covers what you actually use; anything your AI plan already bundles is auto-selected and marked <em>included</em>.</p>
+      <div class="updated">
+        <span>Last updated on July 5, 2026</span>
+        <button class="infobtn" id="infobtn" aria-expanded="false" aria-label="About this data">
+          <svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6Zm1-8q.425 0 .713-.288T13 8q0-.425-.287-.712T12 7q-.425 0-.712.288T11 8q0 .425.288.713T12 9Zm0 13q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.787 3.9t-2.138 3.175q-1.35 1.35-3.175 2.138T12 22Zm0-2q3.35 0 5.675-2.325T20 12q0-3.35-2.325-5.675T12 4Q8.65 4 6.325 6.325T4 12q0 3.35 2.325 5.675T12 20Z"/></svg>
+        </button>
+        <div class="tipbox" id="tipbox" hidden><b>How current is this?</b> Prices were pulled from Google's official plan and support pages on July 5, 2026, and reflect the June 2026 YouTube price increase. Items marked <span class="badge u">check</span> came from a single source or from pages that disagree with each other — confirm on Google's site before you commit.</div>
+      </div>
     </header>
-    <div class="freshness">
-      <svg viewBox="0 0 24 24"><path d="M1 21 12 2l11 19H1Zm11-3q.425 0 .713-.288T13 17q0-.425-.287-.712T12 16q-.425 0-.712.288T11 17q0 .425.288.713T12 18Zm-1-3h2v-5h-2v5Z"/></svg>
-      <div><b>How current is this?</b> Prices were pulled from Google's official plan and support pages on July 5, 2026, and reflect the June 2026 YouTube price increase. Items marked <span class="badge u">check</span> came from a single source or from pages that disagree with each other — confirm on Google's site before you commit.</div>
-    </div>
 
     <div class="optimizer">
       <div class="questions">
+        <div class="qviewport" id="qviewport">
+        <div class="qtrack" id="qtrack">
         <div class="qcard">
           <p class="qlabel">Who is this for?</p>
           <p class="qhint">Family YouTube plans require everyone at the same home address — <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">checked every 30 days</a>.</p>
@@ -313,23 +342,24 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
 
         <div class="qcard">
           <p class="qlabel">YouTube without ads?</p>
-          <p class="qhint">"Lite" removes ads on regular videos only — no YouTube Music, and ads can still appear on Shorts and music content.</p>
+          <p class="qhint">Lite removes ads on regular videos only — no YouTube Music, no downloads or background play, and ads can remain on Shorts. Full Premium adds all of those.</p>
           <div class="chips" data-q="youtube" role="group" aria-label="YouTube preference">
             <button class="chip" data-v="none" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ads don't bother me</button>
-            <button class="chip" data-v="lite" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free videos, just me</button>
-            <button class="chip" data-v="full" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free + Music, just me</button>
+            <button class="chip" data-v="lite" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Just videos ad-free (Lite)</button>
+            <button class="chip" data-v="full" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Full Premium: videos + Music</button>
             <button class="chip" data-v="family" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ad-free for the whole family</button>
           </div>
         </div>
 
         <div class="qcard">
           <p class="qlabel">How much Gemini / Google AI?</p>
-          <p class="qhint">AI plans are also storage plans — picking one here can make a separate Google One plan redundant. <a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Compare AI plans</a></p>
+          <p class="qhint">AI plans are also storage plans — picking one here can make a separate Google One plan redundant. Ultra $100 gets 5× Pro's limits and 20 TB; Ultra $200 gets 20× limits, 30 TB, and Project Genie/Mariner. <a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Compare AI plans</a></p>
           <div class="chips" data-q="ai" role="group" aria-label="AI need">
             <button class="chip" data-v="0" aria-pressed="true"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>None</button>
             <button class="chip" data-v="1" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Casual (AI Plus)</button>
             <button class="chip" data-v="2" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Power user (AI Pro)</button>
-            <button class="chip" data-v="3" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Maximum (AI Ultra)</button>
+            <button class="chip" data-v="3" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ultra ($100)</button>
+            <button class="chip" data-v="4" aria-pressed="false"><svg class="tick" viewBox="0 0 24 24"><path d="M9.55 18 3.85 12.3l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18Z"/></svg>Ultra ($200 · top tier)</button>
           </div>
         </div>
 
@@ -359,6 +389,14 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
             <label class="chk"><input type="checkbox" id="x-fi"> Google Fi phone plan</label>
             <label class="chk"><input type="checkbox" id="x-yttv"> YouTube TV (live TV)</label>
           </div>
+        </div>
+        </div><!-- /qtrack -->
+        </div><!-- /qviewport -->
+        <div class="qnav">
+          <button class="iconbtn" id="qprev" aria-label="Previous question"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M15.4 18.6 9 12.2l6.4-6.4 1.4 1.4-5 5 5 5Z"/></svg></button>
+          <div class="qdots" id="qdots"></div>
+          <span class="qcount" id="qcount">1 / 7</span>
+          <button class="iconbtn" id="qnext" aria-label="Next question"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="m8.6 18.6-1.4-1.4 5-5-5-5L8.6 5.8l6.4 6.4Z"/></svg></button>
         </div>
       </div>
 
@@ -415,9 +453,17 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
           <td class="inc">Health Premium ($9.99 value)</td>
         </tr>
         <tr>
-          <td><a class="ext" href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener"><b>Google AI Ultra</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a><span class="badge u">check</span></td>
-          <td class="num">from $100</td>
-          <td class="inc">20 TB+</td><td class="inc">Up to 20× Pro's limits</td>
+          <td><a class="ext" href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener"><b>Google AI Ultra ($100)</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a></td>
+          <td class="num">$100</td>
+          <td class="inc">20 TB</td><td class="inc">5× Pro's limits, Gemini Spark, $100 Cloud credits</td>
+          <td class="inc">Full Premium (individual) <span class="badge mgr">manager only</span></td>
+          <td class="inc">Premium Advanced ($20 value)</td>
+          <td class="inc">Health Premium</td>
+        </tr>
+        <tr>
+          <td><a class="ext" href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener"><b>Google AI Ultra ($200)</b><svg viewBox="0 0 24 24"><path d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h6v2H5v14h14v-6h2v6q0 .825-.587 1.413T19 21H5ZM9.7 15.7 8.3 14.3 17.6 5H14V3h7v7h-2V6.4l-9.3 9.3Z"/></svg></a></td>
+          <td class="num">$200</td>
+          <td class="inc">30 TB</td><td class="inc">20× Pro's limits, Project Genie &amp; Mariner, 12,500 AI credits</td>
           <td class="inc">Full Premium (individual) <span class="badge mgr">manager only</span></td>
           <td class="inc">Premium Advanced ($20 value)</td>
           <td class="inc">Health Premium</td>
@@ -442,7 +488,7 @@ footer.site{margin:64px 0 0; color:var(--on-variant); font-size:12.5px; line-hei
         <tr><td><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google One 200 GB</a><span class="badge u">check</span></td><td class="num">$2.99</td><td class="num">$29.99</td><td>+5</td><td>Long-standing tier; not re-verified in this pass.</td></tr>
         <tr><td><a href="https://one.google.com/about/plans" target="_blank" rel="noopener">Google AI Plus</a></td><td class="num">$9.99</td><td class="num">—</td><td>+5</td><td>Replaced the old 2 TB "Premium" tier as the $9.99 plan. Sold in 400 GB and 2 TB variants depending on membership.</td></tr>
         <tr><td><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI Pro</a></td><td class="num">$19.99</td><td class="num">$199.99 (~$16.67/mo)</td><td>+5 (AI &amp; storage)</td><td>Bundled YouTube Lite / Home / Health perks are <b>not</b> shared with family (<a href="https://support.google.com/googleone/answer/16105039" target="_blank" rel="noopener">restrictions</a>). Some memberships carry 10 TB.</td></tr>
-        <tr><td><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI Ultra</a><span class="badge u">check</span></td><td class="num">from $100</td><td class="num">—</td><td>+5 (AI &amp; storage)</td><td>New $100 tier added May 2026; the original top tier costs more. Includes full YouTube Premium (individual).</td></tr>
+        <tr><td><a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI Ultra</a></td><td class="num">$100 / $200</td><td class="num">—</td><td>+5 (AI &amp; storage)</td><td>Two tiers since I/O 2026 (top tier cut from $250). $100: 20 TB, 5× Pro's limits, $100 Cloud credits. $200: 30 TB, 20× limits, Project Genie &amp; Mariner. Both include full YouTube Premium (individual).</td></tr>
         <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium (individual)</a></td><td class="num">$15.99</td><td class="num">$159.99 (~$13.33/mo)</td><td>—</td><td>Ad-free everything + Music + downloads + background play.</td></tr>
         <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium (family)</a></td><td class="num">$26.99</td><td class="num">none in US</td><td>+5, same address</td><td>Only way to get ad-free YouTube for a whole household. <a href="https://support.google.com/youtube/answer/7507349" target="_blank" rel="noopener">30-day address check-ins</a> since Sept 2025.</td></tr>
         <tr><td><a href="https://www.youtube.com/premium" target="_blank" rel="noopener">YouTube Premium Lite</a></td><td class="num">$8.99</td><td class="num">—</td><td>—</td><td>Ad-free regular videos only. No Music; ads may remain on Shorts, music, search.</td></tr>
@@ -684,8 +730,10 @@ const ANCHORS=[
   {id:"aiplus",name:"Google AI Plus",link:L.one,price:9.99,gb:2048,ai:1,ytLite:false,ytFull:false,homeStd:false,homeAdv:false,health:false,storePerk:true,
    note:"AI Plus is sold in 400 GB and 2 TB variants depending on membership — this assumes the 2 TB variant; verify which one you're offered."},
   {id:"aipro",name:"Google AI Pro",link:L.ai,price:19.99,annualYr:199.99,gb:5120,ai:2,ytLite:true,ytFull:false,homeStd:true,homeAdv:false,health:true,storePerk:true},
-  {id:"aiultra",name:"Google AI Ultra",link:L.ai,price:100,gb:20480,ai:3,ytLite:true,ytFull:true,homeStd:true,homeAdv:true,health:true,storePerk:true,
-   note:"$100/mo is the new lower Ultra tier (May 2026); the original top tier costs more."}
+  {id:"aiultra100",name:"Google AI Ultra ($100)",link:L.ai,price:100,gb:20480,ai:3,ytLite:true,ytFull:true,homeStd:true,homeAdv:true,health:true,storePerk:true,
+   note:"Ultra $100 also includes Gemini Spark (US) and $100/mo in Google Cloud credits."},
+  {id:"aiultra200",name:"Google AI Ultra ($200)",link:L.ai,price:200,gb:30720,ai:4,ytLite:true,ytFull:true,homeStd:true,homeAdv:true,health:true,storePerk:true,
+   note:"The $200 top tier (cut from $250 at I/O 2026) adds 20× Pro's limits, 30 TB, Project Genie & Mariner, and 12,500 AI credits."}
 ];
 const STORAGE_TIERS=[
   {gb:100,name:"Google One Basic (100 GB)",price:1.99,annualYr:19.99,link:L.one},
@@ -704,7 +752,8 @@ const gbLabel=gb=>gb>=1024?(gb/1024)+" TB":gb+" GB";
 
 function anchorWhy(a){
   const p=[gbLabel(a.gb)+" storage"];
-  if(a.ai===1)p.push("Gemini 2×"); if(a.ai===2)p.push("Gemini Pro 4× + Deep Research"); if(a.ai===3)p.push("Gemini max limits");
+  if(a.ai===1)p.push("Gemini 2×"); if(a.ai===2)p.push("Gemini Pro 4× + Deep Research");
+  if(a.ai===3)p.push("Gemini 5× Pro's limits"); if(a.ai===4)p.push("Gemini 20× Pro's limits + Genie/Mariner");
   if(a.ytFull)p.push("YT Premium"); else if(a.ytLite)p.push("YT Lite");
   if(a.homeAdv)p.push("Home Adv."); else if(a.homeStd)p.push("Home Std.");
   if(a.health)p.push("Health");
@@ -839,26 +888,94 @@ function render(){
     : "";
 }
 
-/* ================= wiring ================= */
-function selectChip(group,value){
-  group.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.v===value)));
-  state[group.dataset.q]=value;
+/* ================= auto-include cascade =================
+   The user's manual picks live in `manual`; the AI plan's bundled coverage can
+   auto-upgrade the effective `state` (never downgrade, never override family). */
+const manual={people:"1",storage:"100",youtube:"none",home:"none",health:"no"};
+const RANK={
+  storage:{"0":0,"100":1,"2048":2,"5120":3},
+  youtube:{none:0,lite:1,full:2,family:9},   /* family is a deliberate choice — never auto-replaced */
+  home:{none:0,std:1,adv:2},
+  health:{no:0,yes:1}
+};
+const INCLUDES={
+  0:{}, 1:{storage:"2048"},
+  2:{storage:"5120",youtube:"lite",home:"std",health:"yes"},
+  3:{storage:"5120",youtube:"full",home:"adv",health:"yes"},
+  4:{storage:"5120",youtube:"full",home:"adv",health:"yes"}
+};
+function applyIncludes(){
+  const inc=INCLUDES[+state.ai]||{};
+  for(const q of ["storage","youtube","home","health"]){
+    const base=manual[q];
+    state[q]=(inc[q]&&RANK[q][inc[q]]>RANK[q][base])?inc[q]:base;
+  }
 }
 /* "Ad-free for the whole family" only makes sense with 2+ people */
 function syncConstraints(){
-  const ytGroup=document.querySelector('.chips[data-q="youtube"]');
-  const famChip=ytGroup.querySelector('.chip[data-v="family"]');
+  const famChip=document.querySelector('.chips[data-q="youtube"] .chip[data-v="family"]');
   const solo=state.people==="1";
   famChip.disabled=solo;
-  famChip.title=solo?'Family plans need a family group — pick a "Family" option above first':'';
-  if(solo&&state.youtube==="family") selectChip(ytGroup,"full");
+  famChip.title=solo?'Family plans need a family group — pick a "Family" option first':'';
+  if(solo&&manual.youtube==="family") manual.youtube="full";
 }
+function paintChips(){
+  const inc=INCLUDES[+state.ai]||{};
+  document.querySelectorAll(".chips[data-q]").forEach(group=>{
+    const q=group.dataset.q;
+    group.querySelectorAll(".chip").forEach(c=>{
+      c.setAttribute("aria-pressed",String(c.dataset.v===state[q]));
+      const old=c.querySelector(".mini"); if(old)old.remove();
+      if(inc[q]&&RANK[q]&&RANK[q][c.dataset.v]>0&&RANK[q][c.dataset.v]<=RANK[q][inc[q]]&&RANK[q][c.dataset.v]<9){
+        const m=document.createElement("span"); m.className="mini"; m.textContent="included"; c.appendChild(m);
+      }
+    });
+  });
+}
+function recompute(){ syncConstraints(); applyIncludes(); paintChips(); render(); }
+
+/* ================= question swiper ================= */
+const track=document.getElementById("qtrack");
+const slides=[...track.children];
+const dots=document.getElementById("qdots");
+slides.forEach((_,i)=>{
+  const d=document.createElement("button"); d.className="qdot";
+  d.setAttribute("aria-label","Question "+(i+1));
+  d.addEventListener("click",()=>go(i));
+  dots.appendChild(d);
+});
+let qIndex=0;
+function go(i){
+  qIndex=Math.max(0,Math.min(slides.length-1,i));
+  track.style.transform="translateX(-"+(qIndex*100)+"%)";
+  document.getElementById("qcount").textContent=(qIndex+1)+" / "+slides.length;
+  document.getElementById("qprev").disabled=qIndex===0;
+  document.getElementById("qnext").disabled=qIndex===slides.length-1;
+  [...dots.children].forEach((d,j)=>d.setAttribute("aria-current",String(j===qIndex)));
+}
+document.getElementById("qprev").addEventListener("click",()=>go(qIndex-1));
+document.getElementById("qnext").addEventListener("click",()=>go(qIndex+1));
+/* swipe */
+const viewport=document.getElementById("qviewport");
+let swipeX=null;
+viewport.addEventListener("pointerdown",e=>{swipeX=e.clientX;},{passive:true});
+viewport.addEventListener("pointerup",e=>{
+  if(swipeX===null)return;
+  const dx=e.clientX-swipeX; swipeX=null;
+  if(Math.abs(dx)>44) go(qIndex+(dx<0?1:-1));
+},{passive:true});
+
+/* ================= wiring ================= */
 document.querySelectorAll(".chips[data-q]").forEach(group=>{
   group.addEventListener("click",e=>{
     const btn=e.target.closest(".chip"); if(!btn||btn.disabled)return;
-    selectChip(group,btn.dataset.v);
-    syncConstraints();
-    render();
+    const q=group.dataset.q;
+    if(q in manual) manual[q]=btn.dataset.v;
+    if(q==="people") state.people=btn.dataset.v;
+    else if(!(q in manual)) state[q]=btn.dataset.v;   /* ai, billing */
+    recompute();
+    /* auto-advance to the next question, but not from the receipt's billing toggle */
+    if(group.closest(".qtrack")&&qIndex<slides.length-1) setTimeout(()=>go(qIndex+1),260);
   });
 });
 document.getElementById("x-fi").addEventListener("change",e=>{state.fi=e.target.checked;render();});
@@ -866,9 +983,20 @@ document.getElementById("x-yttv").addEventListener("change",e=>{state.yttv=e.tar
 document.getElementById("totalbar").addEventListener("click",()=>
   document.getElementById("receipt").scrollIntoView({behavior:"smooth",block:"start"}));
 
+/* info popover on the "last updated" label */
+const infobtn=document.getElementById("infobtn"), tipbox=document.getElementById("tipbox");
+infobtn.addEventListener("click",e=>{
+  e.stopPropagation();
+  tipbox.hidden=!tipbox.hidden;
+  infobtn.setAttribute("aria-expanded",String(!tipbox.hidden));
+});
+document.addEventListener("click",e=>{
+  if(!tipbox.hidden&&!tipbox.contains(e.target)){ tipbox.hidden=true; infobtn.setAttribute("aria-expanded","false"); }
+});
+
 route();
-syncConstraints();
-render();
+go(0);
+recompute();
 })();
 </script>
 </body>
